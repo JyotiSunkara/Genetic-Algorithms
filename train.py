@@ -25,14 +25,14 @@ class Item(object):
     '''Target is unknown, but when target is reached 
     fitness must be least, that is zero'''
     def calcFitness(self): 
-        error = get_errors('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', self.chromosome)
+        error = get_errors('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', self.chromosome.tolist())
         '''Returning validation set error as fitness'''
         return error[1] 
         # 2) Idk what we are supposed to do with training set error
    
 '''Valid numbers are in the range -10 to 10'''
 def create_genome():
-    genome = np.random.uniform(-10, 10, size=(1, 11))
+    genome = np.random.uniform(-10, 10, size = 11)
     return genome
 
 def mate(A, B):
@@ -57,7 +57,7 @@ def main():
     for X in range(POPULATION_SIZE):
         genome = Item(create_genome())
         population.append(genome)
-    
+    found = False
     while not found and generation != 1499:
         '''Sort by fitness'''
         population = sorted(population, key = lambda x:x.fitness) 
@@ -83,7 +83,7 @@ def main():
         population = newGeneration
         generation = generation + 1
 
-    submit_status = submit('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', population[0].chromosome)
+    submit_status = submit('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', population[0].chromosome.tolist())
     assert "submitted" in submit_status
 
 

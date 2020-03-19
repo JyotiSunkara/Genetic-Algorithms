@@ -11,6 +11,16 @@ import random
       c. Perform mutation on new population
       d. Calculate fitness for new population
 '''
+
+from csv import DictWriter
+ 
+def appendDict(fileName, dictElements, fieldNames):
+    
+    with open(fileName, 'a+', newline='') as writeObj:
+        dictWriter = DictWriter(writeObj, fieldnames=fieldNames)
+        dictWriter.writerow(dictElements)
+
+fieldNames = ['Generation','Vector','Fitness']
 POPULATION_SIZE = 100
 
 # 1) Idk how we should be 
@@ -81,8 +91,13 @@ def main():
             newGeneration.append(child)
         
         population = newGeneration
+
+        rowDict = {'Generation': generation, 'Vector': population[0].chromosome, 'Fitness': population[0].fitness}
+        appendDict('store.csv', rowDict, fieldNames)
         generation = generation + 1
 
+    rowDict = {'Generation': generation, 'Vector': population[0].chromosome, 'Fitness': population[0].fitness}
+    appendDict('store.csv', rowDict, fieldNames)
     submit_status = submit('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', population[0].chromosome.tolist())
     assert "submitted" in submit_status
 

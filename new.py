@@ -27,13 +27,12 @@ def initial_population():
 
 def calculate_fitness(population):
     fitness = np.empty(POPULATION_SIZE)
-
-    j = 100
+    # j = 100
     for i in range(POPULATION_SIZE):
-        # error = get_errors(SECRET_KEY, list(population[i]))
-        # fitness[i] = error[0]*0.7 + error[1]
-        fitness[i] = j
-        j-=1
+        error = get_errors(SECRET_KEY, list(population[i]))
+        fitness[i] = error[0]*0.7 + error[1]
+        # fitness[i] = j
+        # j-=1
 
     pop_fit = np.column_stack((population, fitness))
     pop_fit = pop_fit[np.argsort(pop_fit[:,-1])]
@@ -85,7 +84,7 @@ def main():
     population = initial_population()
     population_fitness = calculate_fitness(population)
 
-    num_generations = 3
+    num_generations = 5
     for generation in range(num_generations):   
         
         mating_pool = create_mating_pool(population_fitness)

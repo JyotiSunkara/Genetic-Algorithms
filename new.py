@@ -84,16 +84,22 @@ def main():
     population = initial_population()
     population_fitness = calculate_fitness(population)
 
-    num_generations = 35
+    num_generations = 40
     for generation in range(num_generations):   
         
         mating_pool = create_mating_pool(population_fitness)
         children = create_children(mating_pool)
         population_fitness = new_generation(mating_pool, children)
+        
         fitness = population_fitness[:, -1] 
         population = population_fitness[:, :-1]
 
         for i in range(POPULATION_SIZE):
+            
+            if generation == 39:
+                submit_status = submit(SECRET_KEY, population[i])
+                assert "submitted" in submit_status
+
             rowDict = {'Generation': generation, 'Vector': population[i], 'Fitness': fitness[i]}
             appendDict('store.csv', rowDict, fieldNames)
 

@@ -52,8 +52,8 @@ def crossover(parent1, parent2):
 
     child = np.empty(VECTOR_SIZE)
     crossover_point = random.randint(0, VECTOR_SIZE)
-    print(parent1[:crossover_point])
-    print(parent2[crossover_point:])
+    # print(parent1[:crossover_point])
+    # print(parent2[crossover_point:])
     child[:crossover_point] = parent1[:crossover_point]
     child[crossover_point:] = parent2[crossover_point:]
     child = parent1
@@ -84,7 +84,7 @@ def main():
     population = initial_population()
     population_fitness = calculate_fitness(population)
 
-    num_generations = 5
+    num_generations = 35
     for generation in range(num_generations):   
         
         mating_pool = create_mating_pool(population_fitness)

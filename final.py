@@ -2,7 +2,7 @@ from client_moodle import get_errors, submit
 import numpy as np
 import random 
 from key import SECRET_KEY 
-from csv import DictWriter
+import csv
 
 POPULATION_SIZE = 100
 VECTOR_SIZE = 11
@@ -16,6 +16,12 @@ def appendDict(fileName, dictElements, fieldNames):
     with open(fileName, 'a+', newline='') as writeObj:
         dictWriter = DictWriter(writeObj, fieldnames=fieldNames)
         dictWriter.writerow(dictElements)
+
+def loadCSV(fileName, fieldName, lines):
+    with open(fileName) as f:
+        reader = csv.DictReader(f, delimiter = ',')
+        for row in reader:
+            print(row['1'])
 
 def initial_population():
     first_population = [np.copy(first_parent) for i in range(POPULATION_SIZE)]
@@ -82,24 +88,25 @@ def new_generation(parents_fitness, children):
 def main():
     # population = initial_population()
     # population_fitness = calculate_fitness(population)
-    population_fitness = # LOAD FROM CSV
-    num_generations = 40
-    for generation in range(num_generations):   
+    population_fitness = loadCSV('store.csv', "Generation", 100)
+    print(population_fitness)
+    # num_generations = 40
+    # for generation in range(num_generations):   
         
-        mating_pool = create_mating_pool(population_fitness)
-        children = create_children(mating_pool)
-        population_fitness = new_generation(mating_pool, children)
+    #     mating_pool = create_mating_pool(population_fitness)
+    #     children = create_children(mating_pool)
+    #     population_fitness = new_generation(mating_pool, children)
         
-        fitness = population_fitness[:, -3:] 
-        population = population_fitness[:, :-3]
+    #     fitness = population_fitness[:, -3:] 
+    #     population = population_fitness[:, :-3]
 
-        for i in range(POPULATION_SIZE):
-            if i == 0 or i == 1 or i == 2:
-                submit_status = submit(SECRET_KEY, population[i])
-                assert "submitted" in submit_status
+    #     for i in range(POPULATION_SIZE):
+    #         if i == 0 or i == 1 or i == 2:
+    #             submit_status = submit(SECRET_KEY, population[i])
+    #             assert "submitted" in submit_status
 
-            rowDict = {'Generation': generation, 'Vector': population[i], 'Train Error': fitness[i][0], 'Validation Error': fitness[i][1] ,'Fitness': fitness[i][2]}
-            appendDict('lmao.csv', rowDict, fieldNames)
+    #         rowDict = {'Generation': generation, 'Vector': population[i], 'Train Error': fitness[i][0], 'Validation Error': fitness[i][1] ,'Fitness': fitness[i][2]}
+    #         appendDict('lmao.csv', rowDict, fieldNames)
 
 if __name__ == '__main__':
     main()

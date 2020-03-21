@@ -27,12 +27,11 @@ def initial_population():
 
 def calculate_fitness(population):
     fitness = np.empty(POPULATION_SIZE)
-    # j = 100
+
     for i in range(POPULATION_SIZE):
         error = get_errors(SECRET_KEY, list(population[i]))
         fitness[i] = error[0]*0.7 + error[1]
-        # fitness[i] = j
-        # j-=1
+        # fitness[i] = 6
 
     pop_fit = np.column_stack((population, fitness))
     pop_fit = pop_fit[np.argsort(pop_fit[:,-1])]
@@ -52,11 +51,8 @@ def crossover(parent1, parent2):
 
     child = np.empty(VECTOR_SIZE)
     crossover_point = random.randint(0, VECTOR_SIZE)
-    # print(parent1[:crossover_point])
-    # print(parent2[crossover_point:])
     child[:crossover_point] = parent1[:crossover_point]
     child[crossover_point:] = parent2[crossover_point:]
-    child = parent1
     return child
 
 def create_children(mating_pool):
@@ -84,7 +80,7 @@ def main():
     population = initial_population()
     population_fitness = calculate_fitness(population)
 
-    num_generations = 40
+    num_generations = 8
     for generation in range(num_generations):   
         
         mating_pool = create_mating_pool(population_fitness)
@@ -96,12 +92,12 @@ def main():
 
         for i in range(POPULATION_SIZE):
             
-            if generation == 39:
+            if generation == 10:
                 submit_status = submit(SECRET_KEY, population[i])
                 assert "submitted" in submit_status
 
             rowDict = {'Generation': generation, 'Vector': population[i], 'Fitness': fitness[i]}
-            appendDict('store.csv', rowDict, fieldNames)
+            appendDict('shradha.csv', rowDict, fieldNames)
 
 if __name__ == '__main__':
     main()

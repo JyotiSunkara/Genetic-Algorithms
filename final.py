@@ -32,12 +32,11 @@ def calculate_fitness(population):
     fitness = np.empty((POPULATION_SIZE, 3))
 
     for i in range(POPULATION_SIZE):
-        # error = get_errors(SECRET_KEY, list(population[i]))
-        error = [1, 1]
+        error = get_errors(SECRET_KEY, list(population[i]))
+        # error = [1, 1]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = error[0]*0.7 + error[1]
-        # population_errors[i] = error
         # fitness[i] = 6
 
     pop_fit = np.column_stack((population, fitness))
@@ -83,10 +82,13 @@ def new_generation(parents_fitness, children):
 
 
 def main():
-    population = initial_population()
-    population_fitness = calculate_fitness(population)
+    # population = initial_population()
+    # population_fitness = calculate_fitness(population)
     # population_fitness = # LOAD FROM CSV
-    num_generations = 1
+    # with open('clean_36.json','r+') as f:
+    #     population_fitness = np.array(json.loads(f.read())['population'])
+    # print(population_and_fitness[0])
+    num_generations = 4
 
     if where_json(FILE_NAME):
         with open(FILE_NAME) as json_file:
@@ -112,22 +114,19 @@ def main():
         population = population_fitness[:, :-3]      
         
         for i in range(POPULATION_SIZE):
-            # if i == 0 or i == 1 or i == 2:
-            #     submit_status = submit(SECRET_KEY, population[i])
-            #     assert "submitted" in submit_status
+            if i == 0 or i == 1:
+                submit_status = submit(SECRET_KEY, population[i].tolist())
+                assert "submitted" in submit_status
             with open(FILE_NAME) as json_file:
                 data = json.load(json_file)
                 temporary = data["Storage"]
                 
-                rowDict = { "Generation": generation, 
+                rowDict = { "Generation": 7 + generation, 
                             "Vector": population[i].tolist(), 
                             "Train Error": fitness[i][0], 
                             "Validation Error": fitness[i][1],
                             "Fitness": fitness[i][2]}
-                # rowJSON = json.dumps(rowDict)
                 temporary.append(rowDict)
-                # print(rowJSON)
-            # print(data["Storage"][99]["Vector"])
             write_json(data)
 
 if __name__ == '__main__':

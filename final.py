@@ -3,19 +3,22 @@ import numpy as np
 import random 
 from key import SECRET_KEY 
 import json
+import os
 
 POPULATION_SIZE = 100
 VECTOR_SIZE = 11
 MATING_POOL_SIZE = 10
+FILE_NAME = 'JSON/shradha.json'
 first_parent = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
-def write_json(data, fileName):
-    
-    with open(fileName, 'a+') as writeObj:
-        json.dump(row_values, writeObj, indent = 4)
+def where_json(fileName):
+    return os.path.exists(fileName)
 
+def write_json(data, filename='shradha.json'): 
+    with open(filename,'w') as f: 
+        json.dump(data, f, indent = 4) 
 
 def initial_population():
     first_population = [np.copy(first_parent) for i in range(POPULATION_SIZE)]
@@ -82,29 +85,46 @@ def new_generation(parents_fitness, children):
 def main():
     population = initial_population()
     population_fitness = calculate_fitness(population)
-    # population_fitness = loadCSV('store.csv', "Generation", 100)
-    # print(population_fitness)
-    num_generations = 40
-    for generation in range(num_generations):   
-        
-        mating_pool = create_mating_pool(population_fitness)
-        children = create_children(mating_pool)
-        population_fitness = new_generation(mating_pool, children)
-        
-        fitness = population_fitness[:, -3:] 
-        population = population_fitness[:, :-3]
+    # population_fitness = # LOAD FROM CSV
+    num_generations = 1
 
-        for i in range(POPULATION_SIZE):
-            # if i == 0 or i == 1 or i == 2:
-            #     submit_status = submit(SECRET_KEY, population[i])
-            #     assert "submitted" in submit_status
-            
-            with open('lmao.json') as json_file:
-                data = json.load(json_file)
-                temp = data['Characteristics']
-                rowValues = {'Generation': generation, 'Vector': population[i], 'Train Error': fitness[i][0], 'Validation Error': fitness[i][1] ,'Fitness': fitness[i][2]}
-                temp.append(rowValues)
-        write_json(data, lmao.json)
+    if where_json('shradha.json'):
+        with open('shradha.json') as json_file:
+            data = json.load(json_file)
+            temporary = data["Storage"]
+        pass
+    else:
+        data = {"Storage": []}
+        with open('shradha.json', 'w') as writeObj:
+            json.dump(data, writeObj)
+
+    # for generation in range(num_generations):   
+
+    #     mating_pool = create_mating_pool(population_fitness)
+    #     children = create_children(mating_pool)
+    #     population_fitness = new_generation(mating_pool, children)
+
+    #     fitness = population_fitness[:, -3:] 
+    #     population = population_fitness[:, :-3]      
+        
+    #     for i in range(POPULATION_SIZE):
+    #         # if i == 0 or i == 1 or i == 2:
+    #         #     submit_status = submit(SECRET_KEY, population[i])
+    #         #     assert "submitted" in submit_status
+    #         with open('shradha.json') as json_file:
+    #             data = json.load(json_file)
+    #             temporary = data["Storage"]
+                
+    #             rowDict = { "Generation": generation, 
+    #                         "Vector": population[i].tolist(), 
+    #                         "Train Error": fitness[i][0], 
+    #                         "Validation Error": fitness[i][1],
+    #                         "Fitness": fitness[i][2]}
+    #             # rowJSON = json.dumps(rowDict)
+    #             temporary.append(rowDict)
+    #             # print(rowJSON)
+    #         # print(data["Storage"][99]["Vector"])
+    #         write_json(data)
 
 if __name__ == '__main__':
-    main()
+    main() 

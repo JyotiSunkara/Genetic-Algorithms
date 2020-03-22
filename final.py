@@ -36,7 +36,7 @@ def calculate_fitness(population):
         # error = [1, 1]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
-        fitness[i][2] = error[0]*0.7 + error[1]
+        fitness[i][2] = error[0]*0.5 + error[1]
         # fitness[i] = 6
 
     pop_fit = np.column_stack((population, fitness))
@@ -50,7 +50,13 @@ def create_mating_pool(population_fitness):
 
 def mutation(child):
     mutation_index = random.randint(0, VECTOR_SIZE-1)
-    child[mutation_index] = random.uniform(-10,10)
+    if mutation_index == 0 or mutation_index==1:
+        child[mutation_index] = random.uniform(-10,10)
+    else:
+        vary = 1 + random.uniform(-0.0012,0.0012)
+        rem = child[mutation_index]*vary
+        if abs(rem) <= 10:
+            child[mutation_index] = rem
     return child
 
 def crossover(parent1, parent2):
@@ -77,6 +83,7 @@ def new_generation(parents_fitness, children):
     children_fitness = calculate_fitness(children)
     children_fitness = children_fitness[:90]
     generation = np.concatenate((parents_fitness, children_fitness))
+    generation = generation[np.argsort(generation[:,-1])]
     return generation
 
 
@@ -99,6 +106,7 @@ def main():
             fitness = [dict_item["Fitness"] for dict_item in data["Storage"][-100:]]
 
             population_fitness = np.column_stack((population, train, valid, fitness))
+            population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
     else:
         data = {"Storage": []}
         with open(FILE_NAME, 'w') as writeObj:
@@ -121,7 +129,7 @@ def main():
                 data = json.load(json_file)
                 temporary = data["Storage"]
                 
-                rowDict = { "Generation": 7 + generation, 
+                rowDict = { "Generation": 35 + generation, 
                             "Vector": population[i].tolist(), 
                             "Train Error": fitness[i][0], 
                             "Validation Error": fitness[i][1],

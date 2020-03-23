@@ -14,10 +14,10 @@ population_fitness = [[],[],[],[]]
 if where_json(FILE_NAME):
         with open(FILE_NAME) as json_file:
             data = json.load(json_file)
-            population = [dict_item["Vector"] for dict_item in data["Storage"][-100:]]
-            train = [dict_item["Train Error"] for dict_item in data["Storage"][-100:]]
-            valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-100:]]
-            fitness = [dict_item["Fitness"] for dict_item in data["Storage"][-100:]]
+            population = [dict_item["Vector"] for dict_item in data["Storage"]]
+            train = [dict_item["Train Error"] for dict_item in data["Storage"]]
+            valid = [dict_item["Validation Error"] for dict_item in data["Storage"]]
+            fitness = [dict_item["Fitness"] for dict_item in data["Storage"]]
     
             population_fitness = np.column_stack((population, train, valid, fitness))
             population_fitness = population_fitness[np.argsort(population_fitness[:,-2])]

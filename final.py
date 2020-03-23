@@ -110,7 +110,7 @@ def main():
             population = [dict_item["Vector"] for dict_item in data["Storage"][-100:]]
             train = [dict_item["Train Error"] for dict_item in data["Storage"][-100:]]
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-100:]]
-            offset = data["Storage"][-1]["Generation"]
+            offset = [dict_item["Validation Error"] for dict_item in data["Storage"][-1:]]
             # fitness = [dict_item["Fitness"] for dict_item in data["Storage"][-100:]]
             # print(fitness)
             # print(train, valid)

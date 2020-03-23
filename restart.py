@@ -108,7 +108,8 @@ def main():
             train = [dict_item["Train Error"] for dict_item in data["Storage"][-40:]]
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-40:]]
             fitness = [dict_item["Fitness"] for dict_item in data["Storage"][-40:]]
-            offset = data["Storage"][-1]["Generation"]
+            offset = [dict_item["Validation Error"] for dict_item in data["Storage"][-1:]]
+
             # print(fitness)
             # print(train, valid)
             #fitness = [(train_factor*train[i] + valid[i]) for i in range(POPULATION_SIZE)]

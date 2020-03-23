@@ -98,6 +98,8 @@ def main():
     #     population_fitness = np.array(json.loads(f.read())['population'])
     # print(population_and_fitness[0])
     num_generations = 16
+    offset = 0
+
 
     if where_json(FILE_NAME):
         with open(FILE_NAME) as json_file:
@@ -106,6 +108,7 @@ def main():
             train = [dict_item["Train Error"] for dict_item in data["Storage"][-40:]]
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-40:]]
             fitness = [dict_item["Fitness"] for dict_item in data["Storage"][-40:]]
+            offset = data["Storage"][-1]["Generation"]
             # print(fitness)
             # print(train, valid)
             #fitness = [(train_factor*train[i] + valid[i]) for i in range(POPULATION_SIZE)]
@@ -133,7 +136,7 @@ def main():
                 data = json.load(json_file)
                 temporary = data["Storage"]
                 # print(i)
-                rowDict = { "Generation": 15 + generation, 
+                rowDict = { "Generation": offset + generation, 
                             "Vector": population[i].tolist(), 
                             "Train Error": fitness[i][0], 
                             "Validation Error": fitness[i][1],

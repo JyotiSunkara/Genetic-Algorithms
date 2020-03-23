@@ -1,7 +1,7 @@
 from client_moodle import get_errors, submit
 import numpy as np
 import random 
-# from key import SECRET_KEY 
+from key import SECRET_KEY 
 import json
 import os
 
@@ -11,7 +11,7 @@ MATING_POOL_SIZE = 10
 FILE_NAME = 'JSON/shradha.json'
 first_parent = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
-train_factor = 0.7
+train_factor = 1
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
 def where_json(fileName):
@@ -33,8 +33,8 @@ def calculate_fitness(population):
     fitness = np.empty((POPULATION_SIZE, 3))
 
     for i in range(POPULATION_SIZE):
-        # error = get_errors(SECRET_KEY, list(population[i]))
-        error = [10000000000, 1000000000]
+        error = get_errors(SECRET_KEY, list(population[i]))
+        # error = [10000000000, 1000000000]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = error[0]*train_factor + error[1]
@@ -51,13 +51,18 @@ def create_mating_pool(population_fitness):
 
 def mutation(child):
     mutation_index = random.randint(0, VECTOR_SIZE-1)
-    if mutation_index == 0 or mutation_index==1:
-        child[mutation_index] = random.uniform(-10,10)
-    else:
-        vary = 1 + random.uniform(-0.0015,0.0015)
-        rem = child[mutation_index]*vary
-        if abs(rem) <= 10:
-            child[mutation_index] = rem
+    # if mutation_index < 7:
+    #     child[1] = random.uniform(6.4, 6.7)
+    # if mutation_index < 7:
+    #     vary = 1 + random.uniform(-0.12, 0.12)
+    #     rem = child[mutation_index]*vary
+    #     if abs(rem) <= 10:
+    #         child[mutation_index] = rem
+    # else:
+    vary = 1 + random.uniform(-0.0001, 0.0001)
+    rem = child[mutation_index]*vary
+    if abs(rem) <= 10:
+        child[mutation_index] = rem
     return child
 
 def crossover(parent1, parent2):
@@ -96,7 +101,7 @@ def main():
     # with open('clean_36.json','r+') as f:
     #     population_fitness = np.array(json.loads(f.read())['population'])
     # print(population_and_fitness[0])
-    num_generations = 2
+    num_generations = 5
 
     if where_json(FILE_NAME):
         with open(FILE_NAME) as json_file:
@@ -106,19 +111,15 @@ def main():
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-100:]]
             # fitness = [dict_item["Fitness"] for dict_item in data["Storage"][-100:]]
             # print(fitness)
-            print(train, valid)
+            # print(train, valid)
             fitness = [(train_factor*train[i] + valid[i]) for i in range(POPULATION_SIZE)]
             population_fitness = np.column_stack((population, train, valid, fitness))
             population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
-            print(population_fitness[:,-1])
+            # print(population_fitness[:,-1])
     else:
         data = {"Storage": []}
         with open(FILE_NAME, 'w') as writeObj:
             json.dump(data, writeObj)
-
-    data = {"Storage": []}
-    with open('lol.json', 'w') as writeObj:
-        json.dump(data, writeObj)
 
     for generation in range(num_generations):   
 
@@ -133,11 +134,11 @@ def main():
             # if i == 0 or i == 1:
             #     submit_status = submit(SECRET_KEY, population[i].tolist())
             #     assert "submitted" in submit_status
-            with open('lol.json') as json_file:
+            with open(FILE_NAME) as json_file:
                 data = json.load(json_file)
                 temporary = data["Storage"]
-                print(i)
-                rowDict = { "Generation": 44 + generation, 
+                # print(i)
+                rowDict = { "Generation": 57 + generation, 
                             "Vector": population[i].tolist(), 
                             "Train Error": fitness[i][0], 
                             "Validation Error": fitness[i][1],

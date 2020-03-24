@@ -133,7 +133,7 @@ def main():
     # with open('clean_36.json','r+') as f:
     #     population_fitness = np.array(json.loads(f.read())['population'])
     # print(population_and_fitness[0])
-    num_generations = 8
+    num_generations = 2
     # offset = 0
 
     if where_json(FILE_NAME_READ):

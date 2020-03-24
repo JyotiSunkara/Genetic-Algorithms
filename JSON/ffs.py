@@ -49,22 +49,25 @@ if __name__ == "__main__":
     Replace "test" with your secret ID and just run this file 
     to verify that the server is working for your ID.
     """
+    # key = 'I22KGMKf3ZqtxxvxklykgAlk1dQZvVqhgfZT1i8NWjOgBC4ntl'
     vec = [
-    -7.0181426278850925,
-    9.840838325772234,
-    -5.898353847139546,
-    0.0494005418683377,
-    0.037836708577746896,
-    8.111032225245027e-05,
-    -6.016147135503486e-05,
-    -1.2706995546461015e-07,
-    3.486275959063019e-08,
-    3.822179974214149e-11,
-    -6.7142900295387635e-12
-]
+                -6.47437705313709,
+                9.915031282546686,
+                -6.095379162998791,
+                0.06116363487362357,
+                0.037917049989923374,
+                8.507648718298185e-05,
+                -6.018147135503486e-05,
+                -1.2761030001770375e-07,
+                3.486378130484902e-08,
+                3.911421279922079e-11,
+                -6.706312927923882e-12
+            ]
 
+    # vector = [0e+00,-2e-03,-8e-03,1e-02,-3e-07,3e-12,-1e-09,4e-13,-3e-13,1e-12,-3e-16]
+    # vector = [ i * (1+ np.random.uniform(-1,1,1)[0]) for i in vector]
     err = get_errors('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', vec)
-    print(err)
+    print(err, err[0] + err[1])
     assert len(err) == 2
 
     # submit_status = submit('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', list(-np.arange(0,1.1,0.1)))

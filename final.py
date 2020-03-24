@@ -7,7 +7,7 @@ import os
 
 POPULATION_SIZE = 40
 VECTOR_SIZE = 11
-MATING_POOL_SIZE = 10
+MATING_POOL_SIZE = 15
 FILE_NAME_READ = 'JSON/new.json'
 FILE_NAME_WRITE = 'JSON/new.json'
 first_parent = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
@@ -61,19 +61,19 @@ def mutation(child):
     #         child[mutation_index] = rem
     vary = 0
     if mutation_index == 1:
-        vary = 1 + random.uniform(-0.013, 0)
+        vary = 1 + random.uniform(-0.005, 0)
     
     elif mutation_index == 2:
-        vary = 1 + random.uniform(0, 0.035)
+        vary = 1 + random.uniform(0.01, 0.04)
     
     elif mutation_index == 3:
-        vary = 1 + random.uniform(-0.018, 0)
+        vary = 1 + random.uniform(-0.005, 0.005)
     
     elif mutation_index == 4:
         vary = 1 + random.uniform(0, 0.008)
 
     elif mutation_index == 5:
-        vary = 1 + random.uniform(0, 0.05)
+        vary = 1 + random.uniform(0.009, 0.01)
 
     elif mutation_index == 6:
         vary = 1 + random.uniform(0, 0.009)
@@ -82,13 +82,13 @@ def mutation(child):
         vary = 1 + random.uniform(-0.009, 0)
 
     elif mutation_index == 8:
-        vary = 1 + random.uniform(0, 0.009)
+        vary = 1 + random.uniform(0.0009, 0.009)
 
     elif mutation_index == 9:
-        vary = 1 + random.uniform(-0.009, 0)
+        vary = 1 + random.uniform(-0.009, -0.004)
     
     else:
-        vary = 1 + random.uniform(-0.006, 0.006)
+        vary = 1 + random.uniform(0.0009, 0.001)
     
     rem = child[mutation_index]*vary
     if abs(rem) <= 10:
@@ -118,8 +118,8 @@ def create_children(mating_pool):
 
 def new_generation(parents_fitness, children):
     children_fitness = calculate_fitness(children)
-    parents_fitness = parents_fitness[:9]
-    children_fitness = children_fitness[:31]
+    parents_fitness = parents_fitness[:5]
+    children_fitness = children_fitness[:35]
     generation = np.concatenate((parents_fitness, children_fitness))
     generation = generation[np.argsort(generation[:,-1])]
     return generation
@@ -133,7 +133,7 @@ def main():
     # with open('clean_36.json','r+') as f:
     #     population_fitness = np.array(json.loads(f.read())['population'])
     # print(population_and_fitness[0])
-    num_generations = 12
+    num_generations = 8
     # offset = 0
 
     if where_json(FILE_NAME_READ):

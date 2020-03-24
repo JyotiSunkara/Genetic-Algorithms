@@ -70,7 +70,7 @@ def mutation(child):
         vary = 1 + random.uniform(-0.005, 0.005)
     
     elif mutation_index == 4:
-        vary = 1 + random.uniform(0, 0.008)
+        vary = 1 + random.uniform(0.0009, 0.008)
 
     elif mutation_index == 5:
         vary = 1 + random.uniform(0.009, 0.01)

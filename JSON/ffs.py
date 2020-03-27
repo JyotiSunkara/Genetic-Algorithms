@@ -49,28 +49,29 @@ if __name__ == "__main__":
     Replace "test" with your secret ID and just run this file 
     to verify that the server is working for your ID.
     """
-    key = 'I22KGMKf3ZqtxxvxklykgAlk1dQZvVqhgfZT1i8NWjOgBC4ntl'
-    
+    sec_key = 'dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC'
     
     vec = [
-        0.0, 
-    0.12945764586495642, 
-    -6.039810271058455, 
-    0.0615251831403646,
-    0.036332767382739536, 
-    8.041602949621486e-05, 
-    -5.958473916150738e-05, 
-    -1.3376793283227787e-07, 
-    3.546145059600655e-08, 
-    4.407440521743608e-11, 
-    -6.941006728657045e-12
-    ]
+                0.0,
+                9.941448524394788,
+                -6.039064527230081,
+                0.052994301015706506,
+                0.03633884195379311,
+                8.039502941611496e-05,
+                -5.9559372027853426e-05,
+                -1.3307444718143218e-07,
+                3.546450997857147e-08,
+                4.406440511743599e-11,
+                -6.937314548696058e-12
+            ]
+   
     # vector = [0e+00,-2e-03,-8e-03,1e-02,-3e-07,3e-12,-1e-09,4e-13,-3e-13,1e-12,-3e-16]
     # vector = [ i * (1+ np.random.uniform(-1,1,1)[0]) for i in vector]
-    err = get_errors(key , vec)
-    print(err, err[0] + err[1])
-    assert len(err) == 2
+    
+    # err = get_errors(sec_key , vec2)
+    # print(err, err[0] + err[1])
+    # assert len(err) == 2
 
-    # submit_status = submit(key, vec)
-    # assert "submitted" in submit_status
+    submit_status = submit(sec_key, vec)
+    assert "submitted" in submit_status
     

@@ -5,14 +5,26 @@ from key import SECRET_KEY
 import json
 import os
 
-POPULATION_SIZE = 40
+POPULATION_SIZE = 30
 VECTOR_SIZE = 11
-MATING_POOL_SIZE = 15
-FILE_NAME_READ = 'JSON/shradha.json'
-FILE_NAME_WRITE = 'JSON/shradha.json'
-first_parent = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
+MATING_POOL_SIZE = 10
+FILE_NAME_READ = 'JSON/new.json'
+FILE_NAME_WRITE = 'JSON/new.json'
+first_parent = [2, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                # 0.0000089,
+                # 0.12945764086495665,
+                # -6.039343877382377,
+                # 0.05300478992365601,
+                # 0.03633884195379311,
+                # 8.039603039599496e-05,
+                # -5.9584920882499065e-05,
+                # -1.3287444718143218e-07,
+                # 3.5467598749854526e-08,
+                # 4.406440510633599e-11,
+                # -6.9393347593239754e-12
 
-train_factor = -1
+
+train_factor = 0
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
 def where_json(fileName):
@@ -24,9 +36,15 @@ def write_json(data, filename=FILE_NAME_WRITE):
 
 def initial_population():
     first_population = [np.copy(first_parent) for i in range(POPULATION_SIZE)]
-    for i in range(POPULATION_SIZE-1):
+    for i in range(POPULATION_SIZE):
         index = random.randint(0,10)
-        first_population[i][index] = random.uniform(-10,10)
+        m = random.uniform(0, 0.0006)
+        vary = 1 + random.uniform(-m, m)
+        rem = first_population[i][index]*vary
+        if abs(rem) <= 10:
+            first_population[i][index] = rem
+        else:
+            first_population[i][index] = random.uniform(-1,1)
 
     return first_population
 
@@ -45,51 +63,15 @@ def calculate_fitness(population):
     pop_fit = pop_fit[np.argsort(pop_fit[:,-1])]
     return pop_fit
 
-def create_mating_pool(population_fitness):
+def create_mating_pool(population_fitness, t, v):
     population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
     mating_pool = population_fitness[:MATING_POOL_SIZE]
     return mating_pool
 
 def mutation(child):
     mutation_index = random.randint(0, VECTOR_SIZE-1)
-    # if mutation_index < 7:
-    #     child[1] = random.uniform(9.5, 10)
-    # if mutation_index < 7:
-    #     vary = 1 + random.uniform(-0.12, 0.12)
-    #     rem = child[mutation_index]*vary
-    #     if abs(rem) <= 10:
-    #         child[mutation_index] = rem
-    vary = 0
-    if mutation_index == 1:
-        vary = 1 + random.uniform(-0.005, 0)
-    
-    elif mutation_index == 2:
-        vary = 1 + random.uniform(0.01, 0.04)
-    
-    elif mutation_index == 3:
-        vary = 1 + random.uniform(-0.005, 0.005)
-    
-    elif mutation_index == 4:
-        vary = 1 + random.uniform(0.0009, 0.008)
-
-    elif mutation_index == 5:
-        vary = 1 + random.uniform(0.009, 0.01)
-
-    elif mutation_index == 6:
-        vary = 1 + random.uniform(0, 0.009)
-
-    elif mutation_index == 7:
-        vary = 1 + random.uniform(-0.009, 0)
-
-    elif mutation_index == 8:
-        vary = 1 + random.uniform(0.0009, 0.009)
-
-    elif mutation_index == 9:
-        vary = 1 + random.uniform(-0.009, -0.004)
-    
-    else:
-        vary = 1 + random.uniform(0.0009, 0.001)
-    
+    m = random.uniform(0, 0.005)
+    vary = 1 + random.uniform(-m, m)
     rem = child[mutation_index]*vary
     if abs(rem) <= 10:
         child[mutation_index] = rem
@@ -118,8 +100,8 @@ def create_children(mating_pool):
 
 def new_generation(parents_fitness, children):
     children_fitness = calculate_fitness(children)
-    parents_fitness = parents_fitness[:5]
-    children_fitness = children_fitness[:35]
+    parents_fitness = parents_fitness[:8]
+    children_fitness = children_fitness[:22]
     generation = np.concatenate((parents_fitness, children_fitness))
     generation = generation[np.argsort(generation[:,-1])]
     return generation
@@ -130,11 +112,9 @@ def main():
     # population = initial_population()
     # population_fitness = calculate_fitness(population)
     # population_fitness = # LOAD FROM CSV
-    # with open('clean_36.json','r+') as f:
-    #     population_fitness = np.array(json.loads(f.read())['population'])
-    # print(population_and_fitness[0])
-    num_generations = 1
-    # offset = 0
+
+    num_generations = 10
+    offset = 0
 
     if where_json(FILE_NAME_READ):
         with open(FILE_NAME_READ) as json_file:
@@ -143,14 +123,10 @@ def main():
             train = [dict_item["Train Error"] for dict_item in data["Storage"][-40:]]
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-40:]]
             offset = [dict_item["Generation"] for dict_item in data["Storage"][-1:]]
-            # fitness = [dict_item["Fitness"] for dict_item in data["Storage"][-100:]]
-            # print(fitness)
-            # print(train, valid)
             fitness = [abs(train_factor*train[i] + valid[i]) for i in range(40)]
             population_fitness = np.column_stack((population, train, valid, fitness))
             population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
-            # print(population_fitness[:,-1])
-    else:
+    
         data = {"Storage": []}
         with open(FILE_NAME_WRITE, 'w') as writeObj:
             json.dump(data, writeObj)
@@ -165,15 +141,15 @@ def main():
         population = population_fitness[:, :-3]      
         
         for i in range(POPULATION_SIZE):
-            # print(population[i].tolist())
-            # if i == 0 or i == 1:
+            # if i == 0:
             #     submit_status = submit(SECRET_KEY, population[i].tolist())
             #     assert "submitted" in submit_status
             with open(FILE_NAME_WRITE) as json_file:
                 data = json.load(json_file)
                 temporary = data["Storage"]
-                # print(i)
-                rowDict = { "Generation": generation + 1 + int(list(offset)[0]), 
+                rowDict = { 
+                    "Generation": generation + 1 + int(list(offset)[0]), 
+                            # "Generation": generation,
                             "Vector": population[i].tolist(), 
                             "Train Error": fitness[i][0], 
                             "Validation Error": fitness[i][1],

@@ -63,7 +63,11 @@ def calculate_fitness(population):
     pop_fit = pop_fit[np.argsort(pop_fit[:,-1])]
     return pop_fit
 
-def create_mating_pool(population_fitness):
+def create_mating_pool(population_fitness, t, v):
+
+    for i in range(len(population_fitness)):
+        population_fitness[i][13] = t*population_fitness[i][11] + v*population_fitness[i][12]
+
     population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
     mating_pool = population_fitness[:MATING_POOL_SIZE]
     return mating_pool
@@ -86,11 +90,22 @@ def crossover(parent1, parent2):
     child[crossover_point:] = parent2[crossover_point:]
     return child
 
-def create_children(mating_pool):
-    mating_pool = mating_pool[:, :-3]
+def create_children(mating_pool1, mating_pool2):
+    # mating_pool1 = mating_pool1[:, :-3]
+    # mating_pool2 = mating_pool2[:, :-3]
     children = []
     for i in range(POPULATION_SIZE):
+        f = random.randint(0,1)
+        if f==0:
+            mating_pool = mating_pool1[:, :-3]
+        else:
+            mating_pool = mating_pool2[:, :-3]
         parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
+        f = random.randint(0,1)
+        if f==0:
+            mating_pool = mating_pool1[:, :-3]
+        else:
+            mating_pool = mating_pool2[:, :-3]
         parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         child = crossover(parent1, parent2)
         child = mutation(child)
@@ -98,11 +113,12 @@ def create_children(mating_pool):
 
     return children 
 
-def new_generation(parents_fitness, children):
+def new_generation(parents_fitness1, parents_fitness2, children):
     children_fitness = calculate_fitness(children)
-    parents_fitness = parents_fitness[:8]
+    parents_fitness1 = parents_fitness1[:4]
+    parents_fitness2 = parents_fitness2[:4]
     children_fitness = children_fitness[:22]
-    generation = np.concatenate((parents_fitness, children_fitness))
+    generation = np.concatenate((parents_fitness1, parents_fitness2, children_fitness))
     generation = generation[np.argsort(generation[:,-1])]
     return generation
 
@@ -113,19 +129,20 @@ def main():
     # population_fitness = calculate_fitness(population)
     # population_fitness = # LOAD FROM CSV
 
-    num_generations = 3
+    num_generations = 10
     offset = 0
 
     if where_json(FILE_NAME_READ):
         with open(FILE_NAME_READ) as json_file:
             data = json.load(json_file)
-            population = [dict_item["Vector"] for dict_item in data["Storage"][-30:]]
-            train = [dict_item["Train Error"] for dict_item in data["Storage"][-30:]]
-            valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-30:]]
+            population = [dict_item["Vector"] for dict_item in data["Storage"][-40:]]
+            train = [dict_item["Train Error"] for dict_item in data["Storage"][-40:]]
+            valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-40:]]
             offset = [dict_item["Generation"] for dict_item in data["Storage"][-1:]]
-            fitness = [abs(train[i] + valid[i]) for i in range(30)]
+            fitness = [abs(train_factor*train[i] + valid[i]) for i in range(40)]
             population_fitness = np.column_stack((population, train, valid, fitness))
             population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
+    
     else:
         data = {"Storage": []}
         with open(FILE_NAME_WRITE, 'w') as writeObj:
@@ -133,9 +150,10 @@ def main():
 
     for generation in range(num_generations):   
 
-        mating_pool = create_mating_pool(population_fitness)
-        children = create_children(mating_pool)
-        population_fitness = new_generation(mating_pool, children)
+        mating_pool1 = create_mating_pool(population_fitness, 0.7, 1)
+        mating_pool2 = create_mating_pool(population_fitness, 1, 0.7)
+        children = create_children(mating_pool1, mating_pool2)
+        population_fitness = new_generation(mating_pool1,mating_pool2, children)
 
         fitness = population_fitness[:, -3:] 
         population = population_fitness[:, :-3]      

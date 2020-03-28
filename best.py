@@ -6,8 +6,8 @@ import json
 import os
 
 # Each TOP submits 6 vectors so comment/ choose TOP accordingly
-TOP  = 2
-FILE_NAME = 'JSON/new.json'
+TOP  = 1
+FILE_NAME = 'JSON/restart.json'
 train_factor = 0.8
 valid_factor = 0.8
 
@@ -19,6 +19,7 @@ population_fitness = [[],[],[],[]]
 if where_json(FILE_NAME):
         with open(FILE_NAME) as json_file:
             data = json.load(json_file)
+            generation = [dict_item["Generation"] for dict_item in data["Storage"]]
             population = [dict_item["Vector"] for dict_item in data["Storage"]]
             train = [dict_item["Train Error"] for dict_item in data["Storage"]]
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"]]
@@ -29,7 +30,7 @@ if where_json(FILE_NAME):
             difference = [abs(dict_item["Train Error"] - dict_item["Validation Error"]) for dict_item in data["Storage"]]
 
     
-            population_fitness = np.column_stack((population, train, valid, fitness, valid_fitness, train_fitness, difference))
+            population_fitness = np.column_stack((generation, population, train, valid, fitness, valid_fitness, train_fitness, difference))
             sort_difference = population_fitness[np.argsort(population_fitness[:,-1])]
             sort_trainfit = population_fitness[np.argsort(population_fitness[:,-2])]
             sort_validfit = population_fitness[np.argsort(population_fitness[:,-3])]
@@ -43,36 +44,28 @@ if where_json(FILE_NAME):
             # print(population_fitness[2])
 
         
-        # for i in range(0, TOP):
-        #     submit_status = submit(SECRET_KEY, sort_difference[i][:11].tolist())
-        #     assert "submitted" in submit_status
+        for i in range(0, TOP):
+            print("Difference: ", sort_difference[i][17], " Generation: ", sort_difference[i][0])
+            print(sort_difference[i][1:12].tolist())
+            print()
 
-        #     submit_status = submit(SECRET_KEY, sort_trainfit[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            print("Train Factor: ", sort_trainfit[i][16], " Generation: ", sort_trainfit[i][0])
+            print(sort_trainfit[i][1:12].tolist())
+            print()
 
-        #     submit_status = submit(SECRET_KEY, sort_validfit[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            print("Valid Factor: ", sort_validfit[i][15], " Generation: ", sort_validfit[i][0])
+            print(sort_validfit[i][1:12].tolist())
+            print()
 
-        #     submit_status = submit(SECRET_KEY, sort_valid[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            print("Fitness: ", sort_fitness[i][14], " Generation: ", sort_fitness[i][0])
+            print(sort_fitness[i][1:12].tolist())
+            print()
 
-        #     submit_status = submit(SECRET_KEY, sort_train[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            print("Valid: ", sort_valid[i][13], " Generation: ", sort_valid[i][0])
+            print(sort_valid[i][1:12].tolist())
+            print()
 
-        #     submit_status = submit(SECRET_KEY, sort_fitness[i][:11].tolist())
-        #     assert "submitted" in submit_status
-
-
-        # Worst and middle fitness
-        submit_status = submit(SECRET_KEY, sort_fitness[-1][:11].tolist())
-        assert "submitted" in submit_status
-
-        submit_status = submit(SECRET_KEY, sort_fitness[int(length(sort_fitness/2))][:11].tolist())
-        assert "submitted" in submit_status
-
-        # Worst and middle valid
-        submit_status = submit(SECRET_KEY, sort_valid[-1][:11].tolist())
-        assert "submitted" in submit_status
-
-        submit_status = submit(SECRET_KEY, sort_valid[int(length(sort_fitness/2))][:11].tolist())
-        assert "submitted" in submit_status
+            print("Train: ", sort_train[i][12], " Generation: ", sort_train[i][0])
+            print(sort_train[i][1:12].tolist())
+            print()
+            

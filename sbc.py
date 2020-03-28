@@ -130,17 +130,17 @@ def main():
     # population_fitness = calculate_fitness(population)
     # population_fitness = # LOAD FROM CSV
 
-    num_generations = 4
+    num_generations = 12
     offset = 0
 
     if where_json(FILE_NAME_READ):
         with open(FILE_NAME_READ) as json_file:
             data = json.load(json_file)
-            population = [dict_item["Vector"] for dict_item in data["Storage"][-30:]]
-            train = [dict_item["Train Error"] for dict_item in data["Storage"][-30:]]
-            valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-30:]]
+            population = [dict_item["Vector"] for dict_item in data["Storage"][-POPULATION_SIZE:]]
+            train = [dict_item["Train Error"] for dict_item in data["Storage"][-POPULATION_SIZE:]]
+            valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-POPULATION_SIZE:]]
             offset = [dict_item["Generation"] for dict_item in data["Storage"][-1:]]
-            fitness = [abs(train_factor*train[i] + valid[i]) for i in range(30)]
+            fitness = [abs(train_factor*train[i] + valid[i]) for i in range(POPULATION_SIZE)]
             population_fitness = np.column_stack((population, train, valid, fitness))
             population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
     else:

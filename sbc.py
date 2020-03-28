@@ -113,13 +113,15 @@ def crossover(parent1, parent2):
 def create_children(mating_pool):
     mating_pool = mating_pool[:, :-3]
     children = []
-    for i in range(POPULATION_SIZE):
+    for i in range(15):
         parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         child1, child2 = crossover(parent1, parent2)
         child1 = mutation(child1)
         child2 = mutation(child2)
-        children.append(child)
+        children.append(child1)
+        children.append(child2)
+
 
     return children 
 

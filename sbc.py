@@ -8,23 +8,11 @@ import os
 POPULATION_SIZE = 30
 VECTOR_SIZE = 11
 MATING_POOL_SIZE = 10
-FILE_NAME_READ = 'JSON/new.json'
-FILE_NAME_WRITE = 'JSON/new.json'
-first_parent = [2, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-                # 0.0000089,
-                # 0.12945764086495665,
-                # -6.039343877382377,
-                # 0.05300478992365601,
-                # 0.03633884195379311,
-                # 8.039603039599496e-05,
-                # -5.9584920882499065e-05,
-                # -1.3287444718143218e-07,
-                # 3.5467598749854526e-08,
-                # 4.406440510633599e-11,
-                # -6.9393347593239754e-12
+FILE_NAME_READ = 'JSON/restart.json'
+FILE_NAME_WRITE = 'JSON/restart.json'
+first_parent = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
-
-train_factor = 1
+train_factor = 0.8
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
 def where_json(fileName):
@@ -38,8 +26,8 @@ def initial_population():
     first_population = [np.copy(first_parent) for i in range(POPULATION_SIZE)]
     for i in range(POPULATION_SIZE):
         index = random.randint(0,10)
-        m = random.uniform(0, 0.0006)
-        vary = 1 + random.uniform(-m, m)
+        # m = random.uniform(0, 0.5)
+        vary = 1 + random.uniform(-0.5, 0.5)
         rem = first_population[i][index]*vary
         if abs(rem) <= 10:
             first_population[i][index] = rem
@@ -70,8 +58,8 @@ def create_mating_pool(population_fitness):
 
 def mutation(child):
     mutation_index = random.randint(0, VECTOR_SIZE-1)
-    m = random.uniform(0, 0.005)
-    vary = 1 + random.uniform(-m, m)
+    # m = random.uniform(0, 0.005)
+    vary = 1 + random.uniform(-0.5, 0.5)
     rem = child[mutation_index]*vary
     if abs(rem) <= 10:
         child[mutation_index] = rem
@@ -91,12 +79,14 @@ def crossover(parent1, parent2):
     # If n_c is greater children are closer to parents
     # Mostly n is between 2 to 5
     # n_c can be kept constant as well
-    n_c = 5
+    # n_c = random.randint(3,5)
+    n_c = 4
         
     if (u < 0.5):
         beta = (2 * u)**((n_c + 1)**-1)
     else:
         beta = ((2*(1-u))**-1)**((n_c + 1)**-1)
+
 
     parent1 = np.array(parent1)
     parent2 = np.array(parent2)
@@ -113,7 +103,7 @@ def crossover(parent1, parent2):
 def create_children(mating_pool):
     mating_pool = mating_pool[:, :-3]
     children = []
-    for i in range(15):
+    for i in range( int(POPULATION_SIZE/2)):
         parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         child1, child2 = crossover(parent1, parent2)
@@ -127,8 +117,8 @@ def create_children(mating_pool):
 
 def new_generation(parents_fitness, children):
     children_fitness = calculate_fitness(children)
-    parents_fitness = parents_fitness[:8]
-    children_fitness = children_fitness[:22]
+    parents_fitness = parents_fitness[:5]
+    children_fitness = children_fitness[:25]
     generation = np.concatenate((parents_fitness, children_fitness))
     generation = generation[np.argsort(generation[:,-1])]
     return generation
@@ -140,7 +130,7 @@ def main():
     # population_fitness = calculate_fitness(population)
     # population_fitness = # LOAD FROM CSV
 
-    num_generations = 3
+    num_generations = 4
     offset = 0
 
     if where_json(FILE_NAME_READ):
@@ -150,7 +140,7 @@ def main():
             train = [dict_item["Train Error"] for dict_item in data["Storage"][-30:]]
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-30:]]
             offset = [dict_item["Generation"] for dict_item in data["Storage"][-1:]]
-            fitness = [abs(train[i] + valid[i]) for i in range(30)]
+            fitness = [abs(train_factor*train[i] + valid[i]) for i in range(30)]
             population_fitness = np.column_stack((population, train, valid, fitness))
             population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
     else:

@@ -2,7 +2,7 @@ import json
 import os
 
 READ_FILE = 'JSON/new.json'
-WRITE_FILE = 'JSON/jyoti.json'
+WRITE_FILE = 'JSON/remain.json'
 
 
 def where_json(fileName):
@@ -12,7 +12,8 @@ if where_json(READ_FILE):
     with open(READ_FILE) as readObj:
         getData = json.load(readObj)
         temporary  = []
-        for i in range (0, 2400):
+        length = len(getData["Storage"])
+        for i in range (2400, length):
             rowDict = { 
                             "Generation": getData["Storage"][i]["Generation"], 
                             "Vector": getData["Storage"][i]["Vector"], 

@@ -6,7 +6,7 @@ import json
 import os
 
 TOP  = 3
-FILE_NAME = 'JSON/shradha.json'
+FILE_NAME = 'JSON/remain.json'
 
 def where_json(fileName):
     return os.path.exists(fileName)
@@ -30,20 +30,3 @@ if where_json(FILE_NAME):
                 
                 while (index < length and data["Storage"][index]["Generation"]  == generation):
                     index = index + 1
-
-        # vector = [
-        #         -6.625422368668562,
-        #         9.836601138162878,
-        #         -5.698353847139546,
-        #         0.05134871059461612,
-        #         0.03783905579211601,
-        #         8.111032225245027e-05,
-        #         -6.016147135503486e-05,
-        #         -1.270826147183366e-07,
-        #         3.486275959063019e-08,
-        #         4.080179509798645e-11,
-        #         -6.7134167191713744e-12
-        #     ]
-    
-        # submit_status = submit(SECRET_KEY, vector)
-        # assert "submitted" in submit_status

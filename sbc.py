@@ -12,7 +12,7 @@ FILE_NAME_READ = 'JSON/restart.json'
 FILE_NAME_WRITE = 'JSON/restart.json'
 first_parent = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
-train_factor = 0.8
+train_factor = 1
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
 def where_json(fileName):
@@ -27,7 +27,7 @@ def initial_population():
     for i in range(POPULATION_SIZE):
         index = random.randint(0,10)
         # m = random.uniform(0, 0.5)
-        vary = 1 + random.uniform(-0.5, 0.5)
+        vary = 1 + random.uniform(-0.1, 0.1)
         rem = first_population[i][index]*vary
         if abs(rem) <= 10:
             first_population[i][index] = rem
@@ -59,7 +59,25 @@ def create_mating_pool(population_fitness):
 def mutation(child):
     mutation_index = random.randint(0, VECTOR_SIZE-1)
     # m = random.uniform(0, 0.005)
-    vary = 1 + random.uniform(-0.5, 0.5)
+    vary = 0
+    # if mutation_index == 0 or mutation_index == 1:
+    #     vary = 1 + random.uniform(-0.5, 0.5)
+    # if mutation_index == 2:
+    #     vary = 1 + random.uniform(-0.001, 0.001)
+    # elif mutation_index == 3:
+    #     vary = 1 + random.uniform(-0.28, 0.28)
+    # elif mutation_index == 4:
+    #     vary = 1 + random.uniform(-0.06, 0.06)
+    # elif mutation_index == 5:
+    #     vary = 1 + random.uniform(-0.02, 0.02)
+
+    # elif mutation_index == 6:
+    #     vary = 1 + random.uniform(-0.03, 0.03)
+    # else:
+    #     vary = 1 + random.uniform(-0.02, 0.02)
+    
+    vary = 1 + random.uniform(-0.005, 0.005)
+
     rem = child[mutation_index]*vary
     if abs(rem) <= 10:
         child[mutation_index] = rem
@@ -80,7 +98,7 @@ def crossover(parent1, parent2):
     # Mostly n is between 2 to 5
     # n_c can be kept constant as well
     # n_c = random.randint(3,5)
-    n_c = 4
+    n_c = 3
         
     if (u < 0.5):
         beta = (2 * u)**((n_c + 1)**-1)
@@ -107,8 +125,15 @@ def create_children(mating_pool):
         parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         child1, child2 = crossover(parent1, parent2)
+        
         child1 = mutation(child1)
+        child1 = mutation(child1)
+        child1 = mutation(child1)
+
         child2 = mutation(child2)
+        child2 = mutation(child2)
+        child2 = mutation(child2)
+
         children.append(child1)
         children.append(child2)
 
@@ -117,8 +142,8 @@ def create_children(mating_pool):
 
 def new_generation(parents_fitness, children):
     children_fitness = calculate_fitness(children)
-    parents_fitness = parents_fitness[:5]
-    children_fitness = children_fitness[:25]
+    parents_fitness = parents_fitness[:8]
+    children_fitness = children_fitness[:22]
     generation = np.concatenate((parents_fitness, children_fitness))
     generation = generation[np.argsort(generation[:,-1])]
     return generation
@@ -130,7 +155,7 @@ def main():
     # population_fitness = calculate_fitness(population)
     # population_fitness = # LOAD FROM CSV
 
-    num_generations = 12
+    num_generations = 5
     offset = 0
 
     if where_json(FILE_NAME_READ):
@@ -158,9 +183,9 @@ def main():
         population = population_fitness[:, :-3]      
         
         for i in range(POPULATION_SIZE):
-            # if i == 0:
-            #     submit_status = submit(SECRET_KEY, population[i].tolist())
-            #     assert "submitted" in submit_status
+            if i == 0 or i == 1:
+                submit_status = submit(SECRET_KEY, population[i].tolist())
+                assert "submitted" in submit_status
             with open(FILE_NAME_WRITE) as json_file:
                 data = json.load(json_file)
                 temporary = data["Storage"]

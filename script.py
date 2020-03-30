@@ -6,8 +6,8 @@ import json
 import os
 
 # Each TOP submits 6 vectors so comment/ choose TOP accordingly
-TOP  = 2
-FILE_NAME = 'JSON/new.json'
+TOP  = 33
+FILE_NAME = 'JSON/shradha.json'
 train_factor = 0.8
 valid_factor = 0.8
 
@@ -43,36 +43,36 @@ if where_json(FILE_NAME):
             # print(population_fitness[2])
 
         
-        # for i in range(0, TOP):
-        #     submit_status = submit(SECRET_KEY, sort_difference[i][:11].tolist())
-        #     assert "submitted" in submit_status
+        for i in range(0, TOP):
+            submit_status = submit(SECRET_KEY, sort_difference[i][:11].tolist())
+            assert "submitted" in submit_status
 
-        #     submit_status = submit(SECRET_KEY, sort_trainfit[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            submit_status = submit(SECRET_KEY, sort_trainfit[i][:11].tolist())
+            assert "submitted" in submit_status
 
-        #     submit_status = submit(SECRET_KEY, sort_validfit[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            submit_status = submit(SECRET_KEY, sort_validfit[i][:11].tolist())
+            assert "submitted" in submit_status
 
-        #     submit_status = submit(SECRET_KEY, sort_valid[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            submit_status = submit(SECRET_KEY, sort_valid[i][:11].tolist())
+            assert "submitted" in submit_status
 
-        #     submit_status = submit(SECRET_KEY, sort_train[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            submit_status = submit(SECRET_KEY, sort_train[i][:11].tolist())
+            assert "submitted" in submit_status
 
-        #     submit_status = submit(SECRET_KEY, sort_fitness[i][:11].tolist())
-        #     assert "submitted" in submit_status
+            submit_status = submit(SECRET_KEY, sort_fitness[i][:11].tolist())
+            assert "submitted" in submit_status
 
 
         # Worst and middle fitness
-        submit_status = submit(SECRET_KEY, sort_fitness[-1][:11].tolist())
-        assert "submitted" in submit_status
+        # submit_status = submit(SECRET_KEY, sort_fitness[-1][:11].tolist())
+        # assert "submitted" in submit_status
 
-        submit_status = submit(SECRET_KEY, sort_fitness[int(length(sort_fitness/2))][:11].tolist())
+        submit_status = submit(SECRET_KEY, sort_fitness[int(len(sort_fitness)/2)][:11].tolist())
         assert "submitted" in submit_status
 
         # Worst and middle valid
-        submit_status = submit(SECRET_KEY, sort_valid[-1][:11].tolist())
-        assert "submitted" in submit_status
+        # submit_status = submit(SECRET_KEY, sort_valid[-1][:11].tolist())
+        # assert "submitted" in submit_status
 
-        submit_status = submit(SECRET_KEY, sort_valid[int(length(sort_fitness/2))][:11].tolist())
+        submit_status = submit(SECRET_KEY, sort_valid[int(len(sort_fitness)/2)][:11].tolist())
         assert "submitted" in submit_status

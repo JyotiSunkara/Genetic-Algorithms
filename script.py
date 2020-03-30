@@ -6,8 +6,8 @@ import json
 import os
 
 # Each TOP submits 6 vectors so comment/ choose TOP accordingly
-TOP  = 33
-FILE_NAME = 'JSON/shradha.json'
+TOP  = 31
+FILE_NAME = 'JSON/restart.json'
 train_factor = 0.8
 valid_factor = 0.8
 
@@ -75,4 +75,7 @@ if where_json(FILE_NAME):
         # assert "submitted" in submit_status
 
         submit_status = submit(SECRET_KEY, sort_valid[int(len(sort_fitness)/2)][:11].tolist())
+        assert "submitted" in submit_status
+
+        submit_status = submit(SECRET_KEY, sort_train[int(len(sort_fitness)/2)][:11].tolist())
         assert "submitted" in submit_status

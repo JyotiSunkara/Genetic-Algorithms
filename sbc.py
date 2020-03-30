@@ -18,7 +18,7 @@ fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 def where_json(fileName):
     return os.path.exists(fileName)
 
-def write_json(data, filename=FILE_NAME_WRITE): 
+def write_json(data, filename = FILE_NAME_WRITE): 
     with open(filename,'w') as f: 
         json.dump(data, f, indent = 4) 
 
@@ -98,7 +98,7 @@ def crossover(parent1, parent2):
     # Mostly n is between 2 to 5
     # n_c can be kept constant as well
     # n_c = random.randint(3,5)
-    n_c = 3
+    n_c = 2
         
     if (u < 0.5):
         beta = (2 * u)**((n_c + 1)**-1)
@@ -155,7 +155,7 @@ def main():
     # population_fitness = calculate_fitness(population)
     # population_fitness = # LOAD FROM CSV
 
-    num_generations = 5
+    num_generations = 20
     offset = 0
 
     if where_json(FILE_NAME_READ):

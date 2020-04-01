@@ -8,13 +8,14 @@ import os
 POPULATION_SIZE = 30
 VECTOR_SIZE = 11
 MATING_POOL_SIZE = 10
+FROM_PARENTS = 4
 FILE_NAME_READ = 'JSON/newdot.json'
 FILE_NAME_WRITE = 'JSON/newdot.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
 first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-train_factor = 0.8
+TRAIN_FACTOR = 0.8
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
 def where_json(fileName):
@@ -50,7 +51,7 @@ def calculate_fitness(population):
         # error = [10000000000, 1000000000]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
-        fitness[i][2] = abs(error[0]*train_factor + error[1]) 
+        fitness[i][2] = abs(error[0]*TRAIN_FACTOR + error[1]) 
         # fitness[i][2] = abs(error[0] - error[1])*error[1]
         # fitness[i][2] = error[1]*error[1]
         # fitness[i] = 6
@@ -130,8 +131,8 @@ def create_children(mating_pool):
 
 def new_generation(parents_fitness, children):
     children_fitness = calculate_fitness(children)
-    parents_fitness = parents_fitness[:4]
-    children_fitness = children_fitness[:26]
+    parents_fitness = parents_fitness[:FROM_PARENTS]
+    children_fitness = children_fitness[:(POPULATION_SIZE-FROM_PARENTS)]
     generation = np.concatenate((parents_fitness, children_fitness))
     generation = generation[np.argsort(generation[:,-1])]
     return generation
@@ -153,7 +154,7 @@ def main():
             train = [dict_item["Train Error"] for dict_item in data["Storage"][-POPULATION_SIZE:]]
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-POPULATION_SIZE:]]
             offset = [dict_item["Generation"] for dict_item in data["Storage"][-1:]]
-            fitness = [abs(train_factor*train[i] + valid[i]) for i in range(POPULATION_SIZE)]
+            fitness = [abs(TRAIN_FACTOR*train[i] + valid[i]) for i in range(POPULATION_SIZE)]
             # fitness = [abs(valid[i] - train[i])*valid[i] for i in range(POPULATION_SIZE)]
             # fitness = [valid[i]*valid[i] for i in range(POPULATION_SIZE)]
             population_fitness = np.column_stack((population, train, valid, fitness))

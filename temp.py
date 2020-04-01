@@ -25,42 +25,42 @@ def write_json(data, filename=FILE_NAME_WRITE):
 def initial_population():
     first_population = [np.copy(first_parent) for i in range(POPULATION_SIZE)]
     for i in range(POPULATION_SIZE - 1):
-        mutation_index = random.randint(0, VECTOR_SIZE-1)
-        vary = 0
-        if mutation_index == 1:
-            vary = 1 + random.uniform(-0.001, 0.001)
-        
-        elif mutation_index == 2:
-            vary = 1 + random.uniform(-0.001, 0.001)
-        
-        elif mutation_index == 3:
-            vary = 1 + random.uniform(-0.001, 0.001)
-        
-        elif mutation_index == 4:
-            vary = 1 + random.uniform(-0.001, 0.001)
+        mutation_prob = random.randint(0, 10)
+        if mutation_prob < 4:
+            if mutation_index == 1:
+                vary = 1 + random.uniform(-0.001, 0.001)
+            
+            elif mutation_index == 2:
+                vary = 1 + random.uniform(-0.001, 0.001)
+            
+            elif mutation_index == 3:
+                vary = 1 + random.uniform(-0.001, 0.001)
+            
+            elif mutation_index == 4:
+                vary = 1 + random.uniform(-0.001, 0.001)
 
-        elif mutation_index == 5:
-            vary = 1 + random.uniform(-0.001, 0.001)
+            elif mutation_index == 5:
+                vary = 1 + random.uniform(-0.001, 0.001)
 
-        elif mutation_index == 6:
-            vary = 1 + random.uniform(-0.001, 0.001)
-        elif mutation_index == 7:
-            vary = 1 + random.uniform(-0.001, 0.001)
+            elif mutation_index == 6:
+                vary = 1 + random.uniform(-0.001, 0.001)
+            elif mutation_index == 7:
+                vary = 1 + random.uniform(-0.001, 0.001)
 
-        elif mutation_index == 8:
-            vary = 1 + random.uniform(-0.001, 0.001)
+            elif mutation_index == 8:
+                vary = 1 + random.uniform(-0.001, 0.001)
 
-        elif mutation_index == 9:
-            vary = 1 + random.uniform(-0.001, 0.001)
-        
-        else:
-            vary = 1 + random.uniform(-0.001, 0.001)
-        
-        rem = first_population[i][mutation_index]*vary
-        if abs(rem) <= 10:
-            first_population[i][mutation_index] = rem
+            elif mutation_index == 9:
+                vary = 1 + random.uniform(-0.001, 0.001)
+            
+            else:
+                vary = 1 + random.uniform(-0.001, 0.001)
+            
+            rem = first_population[i][mutation_index]*vary
+            if abs(rem) <= 10:
+                first_population[i][mutation_index] = rem
 
-    return first_population
+        return first_population
 
 def calculate_fitness(population):
     fitness = np.empty((POPULATION_SIZE, 3))

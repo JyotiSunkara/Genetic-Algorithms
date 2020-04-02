@@ -1,14 +1,15 @@
 from client_moodle import get_errors, submit
 import numpy as np
 import random 
-# from key import SECRET_KEY 
+from key import SECRET_KEY 
 import json
 import os
+import itertools
 
-POPULATION_SIZE = 30
+POPULATION_SIZE = 5
 VECTOR_SIZE = 11
-MATING_POOL_SIZE = 10
-FROM_PARENTS = 8
+MATING_POOL_SIZE = 3
+FROM_PARENTS = 2
 FILE_NAME_WRITE = 'trace.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
@@ -113,7 +114,7 @@ def crossover(parent1, parent2):
 def create_children(mating_pool):
     mating_pool = mating_pool[:, :-3]
     children = []
-
+    parents = [[],[]]
     for i in range( int(POPULATION_SIZE/2)):
         parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
@@ -121,11 +122,29 @@ def create_children(mating_pool):
         
         # child1 = mutation(child1)
         # child2 = mutation(child2)
-
+        parents[0].append(parent1)
+        parents[1].append(parent2)
         children.append(child1)
+        
+        parents[0].append(parent1)
+        parents[1].append(parent2)
         children.append(child2)
 
-    return children 
+        parents = np.array(parents).tolist()
+        children = np.array(children).tolist()
+
+        
+
+    # print(parents[0])
+    # print(parents[1])
+    # print(children)
+    parents_children = np.column_stack((parents[0], parents[1], children))
+
+    # print()
+    # print(parents_children)
+    # print()
+    # print()
+    return parents_children, children 
 
 
 def new_generation(parents_fitness, children):
@@ -149,21 +168,23 @@ def main():
     population = np.array(population).tolist()
     population_fitness = calculate_fitness(population)
 
-    num_generations = 5
+    num_generations = 3
 
     data = {"Storage": []}
-    with open(FILE_NAME_WRITE, 'w') as writeObj:
-        firstDict = {
-            "Generation": 1,
-            "Population": population
-        }
+    outDict = {
+        "Generation": 1,
+        "Population": population
+    }
+
     # print(population)
 
     for generation in range(num_generations):   
 
         mating_pool = create_mating_pool(population_fitness)
-        children = create_children(mating_pool)
+        parents_children, children = create_children(mating_pool)
         mutated_children = mutate_children(children)
+        # print(len(parents_children))
+        # print((len(mutated_children)))
         population_fitness = new_generation(mating_pool, mutated_children)
         # for item in population_fitness:
 
@@ -173,12 +194,28 @@ def main():
         children = np.array(children).tolist()
         mutated_children = np.array(mutated_children).tolist()
         if generation == 0:
-            firstDict["Mating Pool"] = mating_pool.tolist()
-            firstDict["Children"] = children
-            firstDict["Mutated Children"] = mutated_children
-            temporary = data["Storage"]
-            temporary.append(firstDict)
+            index = 1
+            temporary = []
+            for (pc, mc) in zip(parents_children, mutated_children):
+                firstDict = {}
+                firstDict["Child Number"] = index
+                firstDict["Parent One"] = pc[:11].tolist()
+                firstDict["Parent Two"] = pc[11:22].tolist()
+                firstDict["Child"] = pc[-11:].tolist()
+                firstDict["Mutant"] = np.array(mc).tolist()
+                index = index + 1
+
+                temporary.append(firstDict)
+                # print(temporary)
+                # print()
+                # print(firstDict)
+            outDict["Details"] = temporary
+            # outDict["Mating Pool"] = mating_pool.tolist()
+            # outDict["Children"] = children
+            # outDict["Mutated Children"] = mutated_children
+            data["Storage"].append(outDict)
             write_json(data)
+            
         else:
             with open(FILE_NAME_WRITE) as writeObj:
                 data = json.load(writeObj)
@@ -186,10 +223,24 @@ def main():
                 rowDict = {
                     "Generation": generation + 1,
                     "Population": population.tolist(),
-                    "Mating Pool": mating_pool.tolist(),
-                    "Children": children,
-                    "Mutated children": mutated_children
                 }
+
+                holding = []
+                index = 1
+                for (pc, mc) in zip(parents_children, mutated_children):
+                    inDict = {}
+                    inDict["Child Number"] = index
+                    inDict["Parent One"] = pc[:11].tolist()
+                    inDict["Parent Two"] = pc[11:22].tolist()
+                    inDict["Child"] = pc[-11:].tolist()
+                    inDict["Mutant"] = np.array(mc).tolist()
+                    index = index + 1
+
+                    holding.append(inDict)
+                rowDict["Details"] = holding
+                # rowDict["Mating Pool"] = mating_pool.tolist()
+                # rowDict["Children"] = children
+                # rowDict["Mutated Children"] = mutated_children
                 temporary.append(rowDict)
             write_json(data)
 

@@ -8,13 +8,13 @@ import itertools
 
 POPULATION_SIZE = 7
 VECTOR_SIZE = 11
-MATING_POOL_SIZE = 5
+MATING_POOL_SIZE = 3
 FROM_PARENTS = 3
-FILE_NAME_WRITE = 'diagram.json'
+FILE_NAME_WRITE = 'diagram2.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-TRAIN_FACTOR = 1
+TRAIN_FACTOR = 0.7
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
 def where_json(fileName):
@@ -31,14 +31,20 @@ def initial_population():
         for index in range(VECTOR_SIZE):
             vary = 0
             mutation_prob = random.randint(0, 10)
-            if mutation_prob < 3:
-                vary = 1 + random.uniform(-0.01, 0.01)
-                rem = overfit_vector[index]*vary
-
-                if abs(rem) < 10:
-                    first_population[i][index] = rem
-                elif abs(first_population[i][index]) >= 10:
-                    first_population[i][index] = random.uniform(-1,1)
+            if mutation_prob < 8 or index == 3:
+                rem = 0
+                if index <=3 and index !=0:
+                    if index == 3 or i == 1:
+                        vary = 1 + random.uniform(-0.01, 0.01)
+                        rem = overfit_vector[index]*vary
+                    else:
+                        vary = random.uniform(-0.01, 0.01)
+                        rem = overfit_vector[index]*vary
+                    
+                    if abs(rem) < 10:
+                        first_population[i][index] = rem
+                    elif abs(first_population[i][index]) >= 10:
+                        first_population[i][index] = random.uniform(-1,1)
 
     return first_population
 
@@ -46,8 +52,8 @@ def calculate_fitness(population):
     fitness = np.empty((len(population), 3))
 
     for i in range(len(population)):
-        # error = get_errors(SECRET_KEY, list(population[i]))
-        error = [10000000000, 1000000000]
+        error = get_errors(SECRET_KEY, list(population[i]))
+        # error = [10000000000, 1000000000]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = abs(error[0]*TRAIN_FACTOR + error[1]) 
@@ -66,8 +72,8 @@ def mutation(child):
     for i in range(VECTOR_SIZE):
         mutation_prob = random.randint(0, 10)
         if mutation_prob < 3:
-            vary = 1 + random.uniform(-0.7, 0.7)
-            rem = child[i]*vary
+            vary = random.uniform(-0.01, 0.01)
+            rem = overfit_vector[i]*vary
             if abs(rem) <= 10:
                 child[i] = rem
     return child
@@ -79,7 +85,7 @@ def crossover(parent1, parent2):
     child2 = np.empty(11)
 
     u = random.random() 
-    n_c = 2
+    n_c = 5
         
     if (u < 0.5):
         beta = (2 * u)**((n_c + 1)**-1)

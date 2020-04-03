@@ -3,9 +3,13 @@ Given coefficients of features corresponding to an overfit model the task is to 
 
 ## Summary
 
+A <b>genetic algorithm</b> is a search heuristic that is inspired by Charles Darwin’s theory of natural evolution. 
+
+We have implemented it as follows: 
+
 - Initialize a population
 - Determine fitness of population
-- Until convergence repeat the following:
+- Until convergence <i>repeat</i> the following:
     - <b>Select parents</b> from the population
     - <b>Crossover</b> to generate children vectors
     - Perform <b>mutation</b> on new population
@@ -23,18 +27,12 @@ The idea is to give preference to the individuals with good fitness scores and a
 ### Crossover 
 This represents mating between individuals to generate new individuals. Two individuals are selected using selection operator and combined in some way to generate children individuals
 
-### Mutation idea
+### Mutations
 The idea is to insert random genes in offspring to maintain the diversity in population to avoid the premature convergence. 
 
 ### Algorithm + Code Explanation
 
-The first population is created using an initial vector. Copies of this vector are made on which we mutate to generate a population of size `POPULATION_SIZE`.
-
-At first, we used the overfit vector as the initial vector as we had to use the information given to us by the TAs and try to improve on that.
-
-However, after running our GA many times with many variations, we got stuck at a local minima. So we decided to bring in some randomization in our initial vector. We tried many things and at one point even initialized each gene of the vector with a random number between (-10, 10). However, we soon realized that this would not work as the search space would become huge and convergence time too large.  
-
-So we applied some <b>[heuristics](#Heuristics)</b> to this initial vector that we will talk about later. 
+The first population is created using an initial vector where all genes are initialized to zero. Copies of this vector are made on which we mutate to generate a population of size `POPULATION_SIZE`.
 
 For each vector, at every index mutation is performed with a probability of `3/11`. Then the value at that index is replaced with the value at the overfit vector at that index multiplied by some factor chosen uniformly between (0.9, 1.1). 
 
@@ -74,8 +72,17 @@ This process is repeated and the values are stored in a JSON file from which we 
 
 As you can see the code is <b>vectorized</b> and <b> completely modular </b> as separate functions have been written for each significant step.
 
+
 ## Diagram
 // Add diagram
+
+## Initial Population
+
+At first, we used the overfit vector as the initial vector as we had to use the information given to us by the TAs and try to improve on that.
+
+However, after running our GA many times with many variations, we got stuck at a local minima. So we decided to bring in some randomization in our initial vector. We tried many things and at one point even initialized each gene of the vector with a random number between (-10, 10). However, we soon realized that this would not work as the search space would become huge and convergence time too large.  
+
+So we applied some <b>[heuristics](#Heuristics)</b> to this initial vector that we will talk about later. 
 
 ## Fitness
 In the fitness function, `get_errors` requests are sent to obtain the train error and validation error for every vector in the population.
@@ -107,16 +114,14 @@ This function ensured the selection of vectors that showed the least variation o
 
 ## Crossover
 
+### Single point crossover 
+
+Initially, we implemented a simple single point crossover where the first parent was copied till a certain index, and the remaining was copied from the second parent.
+
+However, this offered very little variations as the genes were copied directly from either parent. We read research papers and found out about a better technique (described below) that we finally used.
+
 ### Simulated-Binary-Crossover
 
-To generate each vector in the new population, two parents are randomly chosen from the mating pool using `random.randint()`. These parents undergo crossover to generate two children. The child vectors are then mutated before appending to the new population.
-
-```python
-for i in range( int(POPULATION_SIZE/2)):
-    parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
-    parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
-    child1, child2 = crossover(parent1, parent2)
-```
 The entire idea behind simulated binary crossover is to generate two children from two parents, satisfying the following equation. All the while, being able to control the variation between the parents and children using the distribution index value.
 
 <div style="text-align:center;"><img src =./images/logic.png></div>
@@ -130,19 +135,42 @@ The offsprings are calculated as follows:
 
 <div style="text-align:center;"><img src =./images/offspring.png></div>
 
-<!-- ![offsprings](./images/offspring.png) -->
+The code is as follows:
+
+```python
+def crossover(parent1, parent2):
+
+    child1 = np.empty(11)
+    child2 = np.empty(11)
+
+    u = random.random() 
+    n_c = 3
+        
+    if (u < 0.5):
+        beta = (2 * u)**((n_c + 1)**-1)
+    else:
+        beta = ((2*(1-u))**-1)**((n_c + 1)**-1)
+
+
+    parent1 = np.array(parent1)
+    parent2 = np.array(parent2)
+    child1 = 0.5*((1 + beta) * parent1 + (1 - beta) * parent2)
+    child2 = 0.5*((1 - beta) * parent1 + (1 + beta) * parent2)
+
+    return child1, child2
+```
 
 ## Mutation
 
 > Our mutations are probabilistic in nature. For the vector, at every index a mutation is decided to be performed with a probability of `3/11`.
 
-We scale the value at an index by randomly choosing a value between (0.99, 1.01) iff the value after scaling is within the valid (-10, 10) range. The following code does that:
+We scale the value at an index by randomly choosing a value between (0.9, 1.1) iff the value after scaling is within the valid (-10, 10) range. The following code does that:
 
 ```python
 for i in range(VECTOR_SIZE):
     mutation_prob = random.randint(0, 10)
     if mutation_prob < 3:
-        vary = 1 + random.uniform(-0.01, 0.01)
+        vary = 1 + random.uniform(-0.1, 0.1)
         rem = child[i]*vary
         if abs(rem) <= 10:
             child[i] = rem

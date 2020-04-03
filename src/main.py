@@ -1,16 +1,16 @@
 from client_moodle import get_errors, submit
 import numpy as np
 import random 
-from key import SECRET_KEY 
 import json
 import os
 
+SECRET_KEY = 'dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC'
 POPULATION_SIZE = 30
 VECTOR_SIZE = 11
 MATING_POOL_SIZE = 10
 FROM_PARENTS = 8
-FILE_NAME_READ = 'JSON/team_5.json'
-FILE_NAME_WRITE = 'JSON/team_5.json'
+FILE_NAME_READ = 'team_5.json'
+FILE_NAME_WRITE = 'team_5.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
 first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -50,7 +50,8 @@ def calculate_fitness(population):
     fitness = np.empty((POPULATION_SIZE, 3))
 
     for i in range(POPULATION_SIZE):
-        error = get_errors(SECRET_KEY, list(population[i]))
+        # error = get_errors(SECRET_KEY, list(population[i]))
+        error = [1,1]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = abs(error[0]*TRAIN_FACTOR + error[1]) 
@@ -72,7 +73,7 @@ def mutation(child):
             if i <= 4:
                 vary = 1 + random.uniform(-0.05, 0.05)
             else:
-                vary = random.uniform(0, 1)
+                vary = random.uniform(0, 1) # This was set to 1 + random.uniform(-0.05, 0.05) for trace
             rem = overfit_vector[i]*vary
             if abs(rem) <= 10:
                 child[i] = rem
@@ -161,8 +162,8 @@ def main():
         population = population_fitness[:, :-3]      
         
         for i in range(POPULATION_SIZE):
-            submit_status = submit(SECRET_KEY, population[i].tolist())
-            assert "submitted" in submit_status
+            # submit_status = submit(SECRET_KEY, population[i].tolist())
+            # assert "submitted" in submit_status
             with open(FILE_NAME_WRITE) as json_file:
                 data = json.load(json_file)
                 temporary = data["Storage"]

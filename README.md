@@ -8,12 +8,9 @@ Given coefficients of features corresponding to an overfit model the task is to 
 ### Getting Started
 
 ```bash
-$ pip3 install -r requirements.txt
 $ cd src
-$ python3 sbc.py
-$ python3 trace.py 
+$ python3 main.py 
 ```
-
 The trace is stored in `trace.json`.
 
 ## Summary
@@ -268,18 +265,18 @@ It took 250 generations to converge when we tried with the overfit vector. The e
 
 ### Approach 2 (after restart)
 
-It took <b>130</b> generations to converge. We have attached `output.json` for your reference that has all the iterations. Generation 130 has validation error as 225-230K and train error around 245K for most of the vectors. 
+It took <b>130</b> generations to converge. Generation 130 has validation error as 225-230K and train error around 245K for most of the vectors. 
 
-At this point the GA had converged and we had to do fine tuning to reduce the error further. It decreased very slowly after this point as is visible in `output.json`.
+At this point the GA had converged and we had to do fine tuning to reduce the error further. It decreased very slowly after this point.
 The error decreased very slowly after this point and we could finally brought the validation error down to 210K and train error to 239K.
 
 ## Heuristics 
 
 - <b>Initial vector</b>: After almost 11 days of the assignment, our train and validation error were still at ~600K each. Initializing all genes to 0 (reason described [above](#Initial-Population)) reduced each error to about 300K. This was the most important heuristic we applied.
 
-- <b>Varying mutations for different indices </b>: We noticed as we ran our GA that the values at index 0 and 1 seemed to vary drastically, ranging much beyond what was given in the overfit vector (unlike other indices). Hence, we increased the mutations at both of these indices so as to obtain a larger search space for these. Also during our initial runs with the 0 vector and trial and error, we saw indices 5 to 11 were taking on very low values. So we kept their <i>scaling factor</i> between (0,1) (as can be seen in our submitted code) to allow for more variations. Indices 1 to 4 had larger values in the overfit vector so we kept their scaling factor to values close to 1. 
-
 - <b>Probabilistic mutation</b>: Earlier we were mutating on one index only. But we changed our code to mutate each index with a probability of `3/11`, this brought more variation in the genes and worked well for our populations.  
+
+- <b>Varying mutations for different indices </b>: We noticed as we ran our GA that the values at index 0 and 1 seemed to vary drastically, ranging much beyond what was given in the overfit vector (unlike other indices). Hence, we increased the mutations at both of these indices so as to obtain a larger search space for these. Also during our initial runs with the 0 vector and trial and error, we saw indices 5 to 11 were taking on very low values. So we kept their <i>scaling factor</i> between (0,1) to allow for more variations. Indices 1 to 4 had larger values in the overfit vector so we kept their scaling factor to values close to 1. These were just some modifications we kept experimenting with as we ran our code. 
 
 - Variations in fitness function, mating pool size, population size are also heuristics that we applied as the algorithm and the code could not detect when these changes were required. We had to manually study our population and see the impact of these variations and accordingly modify them.
 
@@ -290,7 +287,6 @@ The error decreased very slowly after this point and we could finally brought th
 
 The format is as follows,
 
-```json
 ```json
 {
     "Trace":[
@@ -306,16 +302,9 @@ The format is as follows,
 }
 ```
 
-The JSON file has the following for each generation:
-- Initial Population of the generation
-- For each child of the population, we have stored the following:
-    - The parent vectors (vectors selected for crossover)    
-    - The new offspring (after crossover)
-    - The mutated version of the child vector (final child)
-
 As 8 parents are brought down to new generation, the last 8 children (when sorted by fitness) are not included in the new population for the next generation.
 
-## Potential vector
+## Potential vector 
 
 - Generation: 185,
 - Vector: [

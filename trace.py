@@ -66,8 +66,8 @@ def mutation(child):
     for i in range(VECTOR_SIZE):
         mutation_prob = random.randint(0, 10)
         if mutation_prob < 3:
-            vary = 1 + random.uniform(-0.7, 0.7)
-            rem = child[i]*vary
+            vary = 1 + random.uniform(-0.1, 0.1)
+            rem = overfit_vector[i]*vary
             if abs(rem) <= 10:
                 child[i] = rem
     return child
@@ -156,7 +156,7 @@ def main():
     population = np.array(population).tolist()
     population_fitness = calculate_fitness(population)
 
-    num_generations = 10
+    num_generations = 3
 
     data = {"Trace": []}
     outDict = {

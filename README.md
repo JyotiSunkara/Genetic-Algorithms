@@ -1,7 +1,7 @@
 # Assignment-3
-
-## By Jyoti Sunkara(2018101044) and Shradha Sehgal (2018101071)
 ## Team 5
+## By Jyoti Sunkara(2018101044) and Shradha Sehgal (2018101071)
+
 
 Given coefficients of features corresponding to an overfit model the task is to apply genetic algorithms in order to reduce the overfitting.
 
@@ -38,6 +38,9 @@ The idea is to give preference to the individuals with good fitness scores and a
 
 ### Crossover 
 This represents mating between individuals to generate new individuals. Two individuals are selected using selection operator and combined in some way to generate children individuals
+<br>
+<br>
+
 
 ### Mutations
 The idea is to insert random genes in offspring to maintain the diversity in population to avoid the premature convergence. 
@@ -88,12 +91,30 @@ As you can see the code is <b>vectorized</b> and <b> completely modular </b> as 
 ## Iteration Diagrams
 
 ### First Iteration
+
 <div style="text-align:center;"><img src =./images/One.png></div>
 
+<br>
+<br>
+<br>
+<br>
+
 ### Second Iteration
+
 <div style="text-align:center;"><img src =./images/Two.png></div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
 
 ### Third Iteration
+
+
 <div style="text-align:center;"><img src =./images/Three.png></div>
 
 ## Initial-Population
@@ -154,9 +175,7 @@ However, this offered very little variations as the genes were copied directly f
 ### Simulated-Binary-Crossover
 
 The entire idea behind simulated binary crossover is to generate two children from two parents, satisfying the following equation. All the while, being able to control the variation between the parents and children using the distribution index value.
-
 <div style="text-align:center;"><img src =./images/logic.png></div>
-
 The crossover is done by choosing a random number in the range `[0, 1)`. The distribution index is assigned its value and then $\beta$ is calculated as follows:
 <div style="text-align:center;"><img src =./images/beta.png></div>
 
@@ -254,7 +273,7 @@ We varied our mutation range drastically throughout the assignment.
 
 - We would even assign random numbers at times to make drastic changes when no improvement was shown by the vectors. We did this initially when we first ran the 0 vector and it helped us achieve good results.
 
-- Exact details as to how we did this can be found in the [Mutation][#Mutation] section. 
+- Exact details as to how we did this can be found in the [Mutation](#Mutation) section. 
 
 
 ## Number of iterations to converge 

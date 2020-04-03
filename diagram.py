@@ -46,8 +46,8 @@ def calculate_fitness(population):
     fitness = np.empty((len(population), 3))
 
     for i in range(len(population)):
-        error = get_errors(SECRET_KEY, list(population[i]))
-        # error = [10000000000, 1000000000]
+        # error = get_errors(SECRET_KEY, list(population[i]))
+        error = [10000000000, 1000000000]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = abs(error[0]*TRAIN_FACTOR + error[1]) 
@@ -66,8 +66,8 @@ def mutation(child):
     for i in range(VECTOR_SIZE):
         mutation_prob = random.randint(0, 10)
         if mutation_prob < 3:
-            vary = 1 + random.uniform(-0.1, 0.1)
-            rem = overfit_vector[i]*vary
+            vary = 1 + random.uniform(-0.7, 0.7)
+            rem = child[i]*vary
             if abs(rem) <= 10:
                 child[i] = rem
     return child
@@ -162,8 +162,7 @@ def main():
     outDict = {
         "Generation": 1,
         "Population": population,
-        # "Fitness Values": population_fitness[:, -1:].tolist()
-
+        "Fitness Values": population_fitness[:, -1:].tolist()
     }
 
     # print(population)
@@ -213,8 +212,7 @@ def main():
                 rowDict = {
                     "Generation": generation + 1,
                     "Population": population.tolist(),
-                    # "Fitness Values": population_fitness[:, -1:].tolist()
-
+                    "Fitness Values": population_fitness[:, -1:].tolist()
                 }
 
                 holding = []

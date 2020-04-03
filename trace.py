@@ -6,10 +6,10 @@ import json
 import os
 import itertools
 
-POPULATION_SIZE = 5
+POPULATION_SIZE = 30
 VECTOR_SIZE = 11
-MATING_POOL_SIZE = 3
-FROM_PARENTS = 2
+MATING_POOL_SIZE = 10
+FROM_PARENTS = 10
 FILE_NAME_WRITE = 'trace.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
@@ -52,9 +52,6 @@ def calculate_fitness(population):
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = abs(error[0]*TRAIN_FACTOR + error[1]) 
-        # fitness[i][2] = abs(error[0] - error[1])*error[1]
-        # fitness[i][2] = error[1]*error[1]
-        # fitness[i] = 6
 
     pop_fit = np.column_stack((population, fitness))
     pop_fit = pop_fit[np.argsort(pop_fit[:,-1])]
@@ -83,14 +80,6 @@ def crossover(parent1, parent2):
     child2 = np.empty(11)
 
     u = random.random() 
-        
-    # Distribution index that determines how far children go from parents
-    # Should ideally be updated every generation
-    # Some crazy complex updation that I did not understand
-    # If n_c is greater children are closer to parents
-    # Mostly n is between 2 to 5
-    # n_c can be kept constant as well
-    # n_c = random.randint(3,5)
     n_c = 2
         
     if (u < 0.5):
@@ -168,9 +157,9 @@ def main():
     population = np.array(population).tolist()
     population_fitness = calculate_fitness(population)
 
-    num_generations = 3
+    num_generations = 10
 
-    data = {"Storage": []}
+    data = {"Trace": []}
     outDict = {
         "Generation": 1,
         "Population": population
@@ -201,8 +190,8 @@ def main():
                 firstDict["Child Number"] = index
                 firstDict["Parent One"] = pc[:11].tolist()
                 firstDict["Parent Two"] = pc[11:22].tolist()
-                firstDict["Child"] = pc[-11:].tolist()
-                firstDict["Mutant"] = np.array(mc).tolist()
+                firstDict["After Crossover"] = pc[-11:].tolist()
+                firstDict["After Mutation"] = np.array(mc).tolist()
                 index = index + 1
 
                 temporary.append(firstDict)
@@ -213,13 +202,13 @@ def main():
             # outDict["Mating Pool"] = mating_pool.tolist()
             # outDict["Children"] = children
             # outDict["Mutated Children"] = mutated_children
-            data["Storage"].append(outDict)
+            data["Trace"].append(outDict)
             write_json(data)
             
         else:
             with open(FILE_NAME_WRITE) as writeObj:
                 data = json.load(writeObj)
-                temporary = data["Storage"]
+                temporary = data["Trace"]
                 rowDict = {
                     "Generation": generation + 1,
                     "Population": population.tolist(),
@@ -232,8 +221,8 @@ def main():
                     inDict["Child Number"] = index
                     inDict["Parent One"] = pc[:11].tolist()
                     inDict["Parent Two"] = pc[11:22].tolist()
-                    inDict["Child"] = pc[-11:].tolist()
-                    inDict["Mutant"] = np.array(mc).tolist()
+                    inDict["After Crossover"] = pc[-11:].tolist()
+                    inDict["After Mutation"] = np.array(mc).tolist()
                     index = index + 1
 
                     holding.append(inDict)

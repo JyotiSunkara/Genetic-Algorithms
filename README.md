@@ -6,15 +6,16 @@ Given coefficients of features corresponding to an overfit model the task is to 
 - Initialize a population
 - Determine fitness of population
 - Until convergence repeat the following:
-    - Select parents from the population
-    - Crossover to generate children vectors
-    - Generate new population
-    - Perform mutation on new population
-    - Calculate fitness for new population
+    - <b>Select parents</b> from the population
+    - <b>Crossover</b> to generate children vectors
+    - Perform <b>mutation</b> on new population
+    - Calculate <b>fitness</b> for new population
 
 Each population contains multiple individuals where each individual represents a point in search space and possible solution.
 
-Every individual is a vector of size `11` with `11` floating point values in the range of `[-10, 10]`
+Every individual is a vector of size `11` with `11` floating point values in the range of `[-10, 10]`.
+
+The theoretical details of each stage are given here:
 
 ### Selection 
 The idea is to give preference to the individuals with good fitness scores and allow them to pass there genes to the successive populations.
@@ -22,58 +23,56 @@ The idea is to give preference to the individuals with good fitness scores and a
 ### Crossover 
 This represents mating between individuals to generate new individuals. Two individuals are selected using selection operator and combined in some way to generate children individuals
 
-### Mutation
+### Mutation idea
 The idea is to insert random genes in offspring to maintain the diversity in population to avoid the premature convergence. 
 
-### Algorithm Used
+### Algorithm + Code Explanation
 
-The first population is created using the following vector: 
+The first population is created using an initial vector. Copies of this vector are made on which we mutate to generate a population of size `POPULATION_SIZE`.
 
-```python
-first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-```
+At first, we used the overfit vector as the initial vector as we had to use the information given to us by the TAs and try to improve on that.
 
-`POPULATION_SIZE` copies of this vector are made. All of these vectors are mutated to generate a population.
+However, after running our GA many times with many variations, we got stuck at a local minima. So we decided to bring in some randomization in our initial vector. We tried many things and at one point even initialized each gene of the vector with a random number between (-10, 10). However, we soon realized that this would not work as the search space would become huge and convergence time too large.  
 
-For each vector, at every index a mutation is decided to be performed with a probability of `3/11`.
-Then, the `vary` value is set to be a random float in the range `[-0.01, 0.01] + 1`. Finally, `vary` is multiplied to the float at the chosen index iff the multiplication results in a float within valid range. Else the value at the chosen index is set to a float in the range `[-1, 1]`
+So we applied some <b>[heuristics](#Heuristics)</b> to this initial vector that we will talk about later. 
 
-```python
-first_population = [np.copy(first_parent) for i in range(POPULATION_SIZE)]
-    
-for i in range(POPULATION_SIZE):
-    for index in range(VECTOR_SIZE):
-        vary = 0
-        mutation_prob = random.randint(0, 10)
-        if mutation_prob < 3:
-            vary = 1 + random.uniform(-0.01, 0.01)
-            rem = overfit_vector[index]*vary
+For each vector, at every index mutation is performed with a probability of `3/11`. Then the value at that index is replaced with the value at the overfit vector at that index multiplied by some factor chosen uniformly between (0.9, 1.1). 
 
-            if abs(rem) < 10:
-                first_population[i][index] = rem
-            elif abs(first_population[i][index]) >= 10:
-                first_population[i][index] = random.uniform(-1,1)
-```
+The <b>[fitness](#Fitness)</b> of the population is an arithmetic combination of the train error and the validation error.
 
-The fitness of the population is an arithmetic combination of the train error and the validation error.
+After the population is initialized, a mating pool is made (of `MATING_POOL_SIZE`) containing the best fitness parents. 
 
-The mating pool is selected from the population by sorting the population based on its fitness and then selecting `MATING_POOL_SIZE` number of vectors from the top
+The mating pool is selected from the population by sorting the population based on its fitness and then selecting `MATING_POOL_SIZE` number of vectors from the top.
 
 ```python
-population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
-mating_pool = population_fitness[:MATING_POOL_SIZE]
-return mating_pool
+def create_mating_pool(population_fitness):
+    population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
+    mating_pool = population_fitness[:MATING_POOL_SIZE]
+    return mating_pool
 ```
+Then parents are uniformly chosen from the mating pool as follows:
+
+```python
+parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
+parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
+```
+A <b>[Simulated Binary Crossover](#Simulated-Binary-Crossover) </b> is then performed on the parents to generate an offspring. 
+This is followed by mutation of chromosomes, details of which are given [here](#Mutation).
 
 The new population is created by choosing `X` top children generated and `POPULATION_SIZE - X` top parents.
 
 ```python
-children_fitness = calculate_fitness(children)
-parents_fitness = parents_fitness[:4]
-children_fitness = children_fitness[:26]
-generation = np.concatenate((parents_fitness, children_fitness))
-generation = generation[np.argsort(generation[:,-1])]
+def new_generation(parents_fitness, children):
+    children_fitness = calculate_fitness(children)
+    parents_fitness = parents_fitness[:FROM_PARENTS]
+    children_fitness = children_fitness[:(POPULATION_SIZE-FROM_PARENTS)]
+    generation = np.concatenate((parents_fitness, children_fitness))
+    generation = generation[np.argsort(generation[:,-1])]
+    return generation
 ```
+This process is repeated and the values are stored in a JSON file from which we read the next time we commence. 
+
+As you can see the code is <b>vectorized</b> and <b> completely modular </b> as separate functions have been written for each significant step.
 
 ## Diagram
 // Add diagram
@@ -108,7 +107,7 @@ This function ensured the selection of vectors that showed the least variation o
 
 ## Crossover
 
-### Simulated Binary Crossover
+### Simulated-Binary-Crossover
 
 To generate each vector in the new population, two parents are randomly chosen from the mating pool using `random.randint()`. These parents undergo crossover to generate two children. The child vectors are then mutated before appending to the new population.
 
@@ -123,19 +122,20 @@ The entire idea behind simulated binary crossover is to generate two children fr
 <div style="text-align:center;"><img src =./images/logic.png></div>
 
 The crossover is done by choosing a random number in the range `[0, 1)`. The distribution index is assigned its value and then $\beta$ is calculated as follows:
-
-![beta](./images/beta.png)
+<div style="text-align:center;"><img src =./images/beta.png></div>
 
 Distribution index that determines how far children go from parents. The greater its value the closer the children are to parents. The distribution index is a value between `[2, 5]`.
 
 The offsprings are calculated as follows: 
 
-![offsprings](./images/offspring.png)
+<div style="text-align:center;"><img src =./images/offspring.png></div>
+
+<!-- ![offsprings](./images/offspring.png) -->
 
 ## Mutation
 
-> Our mutations are probabilistic in nature
-For the vector, at every index a mutation is decided to be performed with a probability of `3/11`.
+> Our mutations are probabilistic in nature. For the vector, at every index a mutation is decided to be performed with a probability of `3/11`.
+
 We scale the value at an index by randomly choosing a value between (0.99, 1.01) iff the value after scaling is within the valid (-10, 10) range. The following code does that:
 
 ```python
@@ -179,9 +179,9 @@ We varied this variable from 5 to 15.
 
 - When we were unsure of how our mutations and crossover were performing or when we would change their parameters, we would increase this variable to 15. We did this so that even if things go wrong, our good vectors are still retained in the new generations. This would save us the labour of manually deleting generations in case things go wrong as if there is no improvement by our changes, the best parents from above generations would still be retained and used for mating. 
 
-### Distribution index = 2 to 5
+### Distribution index
 
-This parameter was applied in the `Simulated Binary Crossover`. It determines how far children go from parents. The greater its value the closer the children are to parents. It varies from 2 to 5.
+This parameter was applied in the `Simulated Binary Crossover`. It determines how far children go from parents. The greater its value the closer the children are to parents. It varies from `2 to 5`.
 We changed the Distribution Index value depending on our need. When we felt our vectors were stagnating and needed variation, we changed the value to <b>2, so that the children would have significant variations from their parents</b>. When we saw the errors decreasing steadily, we kept the index as <b>5 so that children would be similar to the parent population, and not too far away</b>.
 
 ### Mutation Range 
@@ -202,4 +202,8 @@ Exact details are mention in the 'Mutation' section above.
 
 ## Heuristics 
 
-We noticed 
+After almost 14 days of the assignment, our train and validation error were still at ~600K each.
+We believe 
+```python
+first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+```

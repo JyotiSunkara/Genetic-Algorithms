@@ -48,13 +48,9 @@ def calculate_fitness(population):
 
     for i in range(POPULATION_SIZE):
         error = get_errors(SECRET_KEY, list(population[i]))
-        # error = [10000000000, 1000000000]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = abs(error[0]*TRAIN_FACTOR + error[1]) 
-        # fitness[i][2] = abs(error[0] - error[1])*error[1]
-        # fitness[i][2] = error[1]*error[1]
-        # fitness[i] = 6
 
     pop_fit = np.column_stack((population, fitness))
     pop_fit = pop_fit[np.argsort(pop_fit[:,-1])]
@@ -83,14 +79,6 @@ def crossover(parent1, parent2):
     child2 = np.empty(11)
 
     u = random.random() 
-        
-    # Distribution index that determines how far children go from parents
-    # Should ideally be updated every generation
-    # Some crazy complex updation that I did not understand
-    # If n_c is greater children are closer to parents
-    # Mostly n is between 2 to 5
-    # n_c can be kept constant as well
-    # n_c = random.randint(3,5)
     n_c = 3
         
     if (u < 0.5):
@@ -103,11 +91,6 @@ def crossover(parent1, parent2):
     parent2 = np.array(parent2)
     child1 = 0.5*((1 + beta) * parent1 + (1 - beta) * parent2)
     child2 = 0.5*((1 - beta) * parent1 + (1 + beta) * parent2)
-
-    # print(child1)
-    # print(child2)
-    # print((parent1 + parent2)/2)
-    # print((child1 + child2)/2)
 
     return child1, child2
 

@@ -49,8 +49,21 @@ if __name__ == "__main__":
     Replace "test" with your secret ID and just run this file 
     to verify that the server is working for your ID.
     """
-
-    err = get_errors('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', list(-np.arange(0,1.1,0.1)))
+    vec = [
+                    0.0,
+                    0.0,
+                    -0.059653459864157016,
+                    0.04927146068222989,
+                    0.0,
+                    0.0,
+                    0.0,
+                    8.810393206711616e-10,
+                    0.0,
+                    2.4620984973162587e-13,
+                    0.0
+                ]
+    err = get_errors('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', vec)
+    print(err[0], err[1], err[0]+ err[1])
     assert len(err) == 2
 
     # submit_status = submit('dnLVLTHPAUOT2R1Ruj1sQvXxWBZZchp8u4WkyZGzaeTQCpyFXC', list(-np.arange(0,1.1,0.1)))

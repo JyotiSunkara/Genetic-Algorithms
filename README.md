@@ -237,6 +237,12 @@ We varied our mutation range drastically throughout the assignment.
 
 ## Number of iterations to converge 
 
+### Approach 1
+
+It took 250 generations to converge when we tried with the overfit vector. The error reduced to 1.31 million total. However, we restarted after reinitializing the initial vectors as all 0s because we could not get out of this local minima.
+
+### Approach 2 (after restart)
+
 It took <b>130</b> generations to converge. We have attached `output.json` for your reference that has all the iterations. Generation 130 has validation error as 225-230K and train error around 245K for most of the vectors. 
 
 At this point the GA had converged and we had to do fine tuning to reduce the error further. It decreased very slowly after this point as is visible in `output.json`.

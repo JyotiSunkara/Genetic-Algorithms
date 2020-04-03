@@ -6,10 +6,10 @@ import json
 import os
 import itertools
 
-POPULATION_SIZE = 7
+POPULATION_SIZE = 30
 VECTOR_SIZE = 11
-MATING_POOL_SIZE = 5
-FROM_PARENTS = 3
+MATING_POOL_SIZE = 8
+FROM_PARENTS = 6
 FILE_NAME_WRITE = 'diagram.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -32,7 +32,7 @@ def initial_population():
             vary = 0
             mutation_prob = random.randint(0, 10)
             if mutation_prob < 3:
-                vary = 1 + random.uniform(-0.01, 0.01)
+                vary = 1 + random.uniform(-0.05, 0.05)
                 rem = overfit_vector[index]*vary
 
                 if abs(rem) < 10:
@@ -47,7 +47,6 @@ def calculate_fitness(population):
 
     for i in range(len(population)):
         error = get_errors(SECRET_KEY, list(population[i]))
-        # error = [10000000000, 1000000000]
         fitness[i][0] = error[0]
         fitness[i][1] = error[1]
         fitness[i][2] = abs(error[0]*TRAIN_FACTOR + error[1]) 
@@ -66,7 +65,7 @@ def mutation(child):
     for i in range(VECTOR_SIZE):
         mutation_prob = random.randint(0, 10)
         if mutation_prob < 3:
-            vary = 1 + random.uniform(-0.1, 0.1)
+            vary = 1 + random.uniform(-0.05, 0.05)
             rem = overfit_vector[i]*vary
             if abs(rem) <= 10:
                 child[i] = rem
@@ -92,11 +91,6 @@ def crossover(parent1, parent2):
     child1 = 0.5*((1 + beta) * parent1 + (1 - beta) * parent2)
     child2 = 0.5*((1 - beta) * parent1 + (1 + beta) * parent2)
 
-    # print(child1)
-    # print(child2)
-    # print((parent1 + parent2)/2)
-    # print((child1 + child2)/2)
-
     return child1, child2
 
 def create_children(mating_pool):
@@ -107,9 +101,6 @@ def create_children(mating_pool):
         parent1 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         parent2 = mating_pool[random.randint(0, MATING_POOL_SIZE-1)]
         child1, child2 = crossover(parent1, parent2)
-        
-        # child1 = mutation(child1)
-        # child2 = mutation(child2)
         parents[0].append(parent1)
         parents[1].append(parent2)
         children.append(child1)
@@ -121,17 +112,7 @@ def create_children(mating_pool):
         parents = np.array(parents).tolist()
         children = np.array(children).tolist()
 
-        
-
-    # print(parents[0])
-    # print(parents[1])
-    # print(children)
     parents_children = np.column_stack((parents[0], parents[1], children))
-
-    # print()
-    # print(parents_children)
-    # print()
-    # print()
     return parents_children, children 
 
 
@@ -162,25 +143,19 @@ def main():
     outDict = {
         "Generation": 1,
         "Population": population,
-        # "Fitness Values": population_fitness[:, -1:].tolist()
+        "Fitness Values": population_fitness[:, -1:].tolist()
 
     }
-
-    # print(population)
 
     for generation in range(num_generations):   
 
         mating_pool = create_mating_pool(population_fitness)
         parents_children, children = create_children(mating_pool)
         mutated_children = mutate_children(children)
-        # print(len(parents_children))
-        # print((len(mutated_children)))
         population_fitness = new_generation(mating_pool, mutated_children)
-        # for item in population_fitness:
 
         fitness = population_fitness[:, -3:] 
         population = population_fitness[:, :-3]      
-        # print(population)
         children = np.array(children).tolist()
         mutated_children = np.array(mutated_children).tolist()
         if generation == 0:
@@ -196,9 +171,6 @@ def main():
                 index = index + 1
 
                 temporary.append(firstDict)
-                # print(temporary)
-                # print()
-                # print(firstDict)
             outDict["Details"] = temporary
             outDict["Mating Pool"] = mating_pool.tolist()
             outDict["Children"] = children
@@ -213,7 +185,6 @@ def main():
                 rowDict = {
                     "Generation": generation + 1,
                     "Population": population.tolist(),
-                    # "Fitness Values": population_fitness[:, -1:].tolist()
 
                 }
 

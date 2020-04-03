@@ -1,4 +1,8 @@
-# Genetic-Algorithms
+# Assignment-3
+
+## By Jyoti Sunkara(2018101044) and Shradha Sehgal (2018101071)
+## Team 5
+
 Given coefficients of features corresponding to an overfit model the task is to apply genetic algorithms in order to reduce the overfitting.
 
 ## Summary
@@ -194,6 +198,8 @@ for i in range(VECTOR_SIZE):
 
 - Sometimes, we even decreased the mutations futher, to reach a finer granularity of our genes. We did this when we were confident we had good vectors that needed more fine tuning. We set the scaling factor between (0.997, 0.1003).
 
+- We also applied other heuristics to it that you can read [here](#Heuristics)
+
 ## Hyperparameters
 
 ### Population size  
@@ -252,7 +258,7 @@ The error decreased very slowly after this point and we could finally brought th
 
 - <b>Initial vector</b>: After almost 11 days of the assignment, our train and validation error were still at ~600K each. Initializing all genes to 0 (reason described [above](#Initial-Population)) reduced each error to about 300K. This was the most important heuristic we applied.
 
-- <b>Varying mutations for index 0 and 1 </b>: We noticed as we ran our GA that the values at index 0 and 1 seemed to vary drastically, ranging much beyond what was given in the overfit vector (unlike other indices). Hence, we increased the mutations at both of these indices so as to obtain a larger search space for these.
+- <b>Varying mutations for different indices </b>: We noticed as we ran our GA that the values at index 0 and 1 seemed to vary drastically, ranging much beyond what was given in the overfit vector (unlike other indices). Hence, we increased the mutations at both of these indices so as to obtain a larger search space for these. Also during our initial runs with the 0 vector and trial and error, we saw indices 5 to 11 were taking on very low values. So we kept their <i>scaling factor</i> between (0,1) (as can be seen in our submitted code) to allow for more variations. Indices 1 to 4 had larger values in the overfit vector so we kept their scaling factor to values close to 1. 
 
 - <b>Probabilistic mutation</b>: Earlier we were mutating on one index only. But we changed our code to mutate each index with a probability of `3/11`, this brought more variation in the genes and worked well for our populations.  
 
@@ -271,4 +277,27 @@ The JSON file has the following for each generation:
     - The mutated version of the child vector (final child)
 
 As 8 parents are brought down to new generation, the last 8 children (when sorted by fitness) are not included in the new population for the next generation.
+
+## Potential vector
+
+- Generation: 185,
+- Vector: [
+    0.0,
+    0.10185624018224995,
+    0.004818839766729392,
+    0.04465639285456346,
+    -2.987380627931603e-10,
+    3.817368728403525e-06,
+    1.2630601687494884e-12,
+    -7.311457739334194e-09,
+    -2.168308617195888e-12,
+    3.5200888153516045e-12,
+    1.4159573224642667e-15
+]
+
+- Train Error: 245541.30284140716,
+- Validation Error: 214556.20713485157,
+- Fitness: 410989.24940797733
+
+We believe this could be the vector on the test server as this is a vector from one of our last populations and has the best validation error we ever saw. It also has a low train error meaning it generalizes well. It is one of the vectors we submitted on the day we got out improved result.
 

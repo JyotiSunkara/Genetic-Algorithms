@@ -10,8 +10,9 @@ POPULATION_SIZE = 30
 VECTOR_SIZE = 11
 MATING_POOL_SIZE = 8
 FROM_PARENTS = 6
-FILE_NAME_WRITE = 'trace2.json'
+FILE_NAME_WRITE = 'voila.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
+
 first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 TRAIN_FACTOR = 1
@@ -32,7 +33,11 @@ def initial_population():
             vary = 0
             mutation_prob = random.randint(0, 10)
             if mutation_prob < 3:
-                vary = 1 + random.uniform(-0.05, 0.05)
+                if index <= 4:
+                  vary = 1 + random.uniform(-0.05, 0.05)  
+                else:
+                    vary = random.uniform(0, 1)
+                
                 rem = overfit_vector[index]*vary
 
                 if abs(rem) < 10:
@@ -63,13 +68,16 @@ def create_mating_pool(population_fitness):
 def mutation(child):
 
     for i in range(VECTOR_SIZE):
-        mutation_prob = random.randint(0, 10)
+        mutation_prob = random.uniform(-1, 1)
         
         if abs(child[i] >= 10):
             child[i] = overfit_vector[i]
 
         if mutation_prob < 3:
-            vary = 1 + random.uniform(-0.05, 0.05)
+            if i <= 4:
+                vary = 1 + random.uniform(-0.05, 0.05)  
+            else:
+                vary = random.uniform(0, 1)
             rem = overfit_vector[i]*vary
             if abs(rem) <= 10:
                 child[i] = rem
@@ -140,18 +148,20 @@ def main():
     population = initial_population()
     population = np.array(population).tolist()
     population_fitness = calculate_fitness(population)
+    population = population_fitness[:, :-3]  
 
-    num_generations = 3
+    num_generations = 10
 
     data = {"Trace": []}
     outDict = {
         "Generation": 1,
-        "Population": population,
+        "Population": population.tolist(),
         "Fitness Values": population_fitness[:, -1:].tolist()
 
     }
 
     for generation in range(num_generations):   
+        # print(generation)
 
         mating_pool = create_mating_pool(population_fitness)
         parents_children, children = create_children(mating_pool)
@@ -160,8 +170,10 @@ def main():
 
         fitness = population_fitness[:, -3:] 
         population = population_fitness[:, :-3]      
+        
         children = np.array(children).tolist()
         mutated_children = np.array(mutated_children).tolist()
+
         if generation == 0:
             index = 1
             temporary = []
@@ -176,9 +188,9 @@ def main():
 
                 temporary.append(firstDict)
             outDict["Details"] = temporary
-            outDict["Mating Pool"] = mating_pool.tolist()
-            outDict["Children"] = children
-            outDict["Mutated Children"] = mutated_children
+            # outDict["Mating Pool"] = mating_pool.tolist()
+            # outDict["Children"] = children
+            # outDict["Mutated Children"] = mutated_children
             data["Trace"].append(outDict)
             write_json(data)
             
@@ -202,12 +214,11 @@ def main():
                     inDict["After Crossover"] = pc[-11:].tolist()
                     inDict["After Mutation"] = np.array(mc).tolist()
                     index = index + 1
-
                     holding.append(inDict)
                 rowDict["Details"] = holding
-                rowDict["Mating Pool"] = mating_pool.tolist()
-                rowDict["Children"] = children
-                rowDict["Mutated Children"] = mutated_children
+                # rowDict["Mating Pool"] = mating_pool.tolist()
+                # rowDict["Children"] = children
+                # rowDict["Mutated Children"] = mutated_children
                 temporary.append(rowDict)
             write_json(data)
 

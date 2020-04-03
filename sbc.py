@@ -9,13 +9,13 @@ POPULATION_SIZE = 30
 VECTOR_SIZE = 11
 MATING_POOL_SIZE = 10
 FROM_PARENTS = 8
-FILE_NAME_READ = 'JSON/newdot.json'
-FILE_NAME_WRITE = 'JSON/newdot.json'
+FILE_NAME_READ = 'JSON/team_5.json'
+FILE_NAME_WRITE = 'JSON/team_5.json'
 overfit_vector = [0.0, 0.1240317450077846, -6.211941063144333, 0.04933903144709126, 0.03810848157715883, 8.132366097133624e-05, -6.018769160916912e-05, -1.251585565299179e-07, 3.484096383229681e-08, 4.1614924993407104e-11, -6.732420176902565e-12]
 
 first_parent = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-TRAIN_FACTOR = 0.8
+TRAIN_FACTOR = 1
 fieldNames = ['Generation','Vector','Train Error','Validation Error', 'Fitness']
 
 def where_json(fileName):
@@ -33,7 +33,10 @@ def initial_population():
             vary = 0
             mutation_prob = random.randint(0, 10)
             if mutation_prob < 3:
-                vary = 1 + random.uniform(-0.01, 0.01)
+                if index <= 4:
+                    vary = 1 + random.uniform(-0.05, 0.05)
+                else:
+                    vary = random.uniform(0, 1)
                 rem = overfit_vector[index]*vary
 
                 if abs(rem) < 10:
@@ -66,8 +69,11 @@ def mutation(child):
     for i in range(VECTOR_SIZE):
         mutation_prob = random.randint(0, 10)
         if mutation_prob < 3:
-            vary = 1 + random.uniform(-0.1, 0.1)
-            rem = child[i]*vary
+            if i <= 4:
+                vary = 1 + random.uniform(-0.05, 0.05)
+            else:
+                vary = random.uniform(0, 1)
+            rem = overfit_vector[i]*vary
             if abs(rem) <= 10:
                 child[i] = rem
     return child
@@ -123,12 +129,10 @@ def new_generation(parents_fitness, children):
 
 
 def main():
-    # population = initial_population()
-    # population_fitness = calculate_fitness(population)
-    # population_fitness = # LOAD FROM CSV
 
     num_generations = 10
-    offset = 0
+    population = []
+    population_fitness = []
 
     if where_json(FILE_NAME_READ):
         with open(FILE_NAME_READ) as json_file:
@@ -138,11 +142,11 @@ def main():
             valid = [dict_item["Validation Error"] for dict_item in data["Storage"][-POPULATION_SIZE:]]
             offset = [dict_item["Generation"] for dict_item in data["Storage"][-1:]]
             fitness = [abs(TRAIN_FACTOR*train[i] + valid[i]) for i in range(POPULATION_SIZE)]
-            # fitness = [abs(valid[i] - train[i])*valid[i] for i in range(POPULATION_SIZE)]
-            # fitness = [valid[i]*valid[i] for i in range(POPULATION_SIZE)]
             population_fitness = np.column_stack((population, train, valid, fitness))
             population_fitness = population_fitness[np.argsort(population_fitness[:,-1])]
     else:
+        population = initial_population()
+        population_fitness = calculate_fitness(population)
         data = {"Storage": []}
         with open(FILE_NAME_WRITE, 'w') as writeObj:
             json.dump(data, writeObj)
@@ -157,15 +161,13 @@ def main():
         population = population_fitness[:, :-3]      
         
         for i in range(POPULATION_SIZE):
-            # if i == 0 or i == 1:
             submit_status = submit(SECRET_KEY, population[i].tolist())
             assert "submitted" in submit_status
             with open(FILE_NAME_WRITE) as json_file:
                 data = json.load(json_file)
                 temporary = data["Storage"]
                 rowDict = { 
-                    "Generation": generation + 1 + int(list(offset)[0]), 
-                            # "Generation": generation,
+                            "Generation": generation + 1,
                             "Vector": population[i].tolist(), 
                             "Train Error": fitness[i][0], 
                             "Validation Error": fitness[i][1],

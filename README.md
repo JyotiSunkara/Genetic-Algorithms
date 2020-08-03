@@ -1,6 +1,4 @@
-# Assignment-3
-## Team 5
-## By Jyoti Sunkara(2018101044) and Shradha Sehgal (2018101071)
+## Genetic Algorithms
 
 
 Given coefficients of features corresponding to an overfit model the task is to apply genetic algorithms in order to reduce the overfitting.
